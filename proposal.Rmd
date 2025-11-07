@@ -1,0 +1,41 @@
+---
+title: "Final Project Proposal"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+# Team Members
+Yuwei Ma (ym3138), Rachel Lu (cl4775) ,Chenxi Liu (cl4776), Xiuhong Fan (xf2302), Daisy Gui (yg3099)
+
+# Tentative Project Title
+Predicting Diabetes Risk from Health and Behavioral Indicators
+
+# Motivation
+Diabetes is one of the most prevalent chronic diseases in the United States, affecting over 34 million Americans and placing an estimated $327 billion annual burden on the healthcare system. The disease not only reduces life expectancy and quality of life but also contributes to severe complications such as heart disease, kidney failure, vision loss, and amputations.
+
+A significant concern is underdiagnosis. One in 5 diabetics and 8 in 10 prediabetics are unaware of their condition. Early identification of at-risk individuals enables lifestyle modification and preventive care, potentially mitigating the burden of diabetes.
+
+The CDC’s Behavioral Risk Factor Surveillance System (BRFSS) provides extensive data on health-related risk behaviors, chronic health conditions, and preventive care usage across the U.S. This project leverages a cleaned 2015 BRFSS dataset to analyze key health and behavioral factors associated with diabetes and to build predictive models that identify individuals at elevated risk.
+
+# Intended Final Products
+
+# Data Description and Sources
+
+The [dataset](https://www.kaggle.com/datasets/alexteboul/diabetes-health-indicators-datascet) is from BRFSS, an annual health-related telephone survey collected by CDC. This data is from the survey in 2015 that was collected from 441,455 Americans. The original dataset has 330 features that are either directly from the responses of participants or calculated from their responses.   
+
+**Target Variable**:
+Diabetes_binary — indicates diabetes presence (1 = prediabetes or diabetes, 0 = no diabetes).
+
+**Feature Variables** (21 total):
+Include health, lifestyle, and demographic indicators such as:
+
+ * Medical: HighBP, HighChol, CholCheck, BMI
+ * Behavioral: Smoker, PhysActivity, Fruits, Veggies, HvyAlcoholConsump
+ * Demographic/Perception: Age, Education, Income, GenHlth, Sex, MentHlth, PhysHlth, DiffWalk
+
+# Planned Analyses/Visualizations
+Analysis: Linear regression
+
+
