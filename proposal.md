@@ -13,98 +13,135 @@ Yuwei Ma, Rachel Lu, Chenxi Liu, Xiuhong Fan, Daisy Gui
 
 # Tentative Project Title
 
-Predicting Diabetes Risk from Health and Behavioral Indicators
+Diabetes Risk Prediction Using Behavioral and Demographic Factors
 
 # Motivation
 
 Diabetes is one of the most prevalent chronic diseases in the United
 States, affecting over 34 million Americans and placing an estimated
-\$327 billion annual burden on the healthcare system. The disease not
-only reduces life expectancy and quality of life but also contributes to
-severe complications such as heart disease, kidney failure, vision loss,
-and amputations.
-
-A significant concern is underdiagnosis. One in 5 diabetics and 8 in 10
-prediabetics are unaware of their condition. Early identification of
-at-risk individuals enables lifestyle modification and preventive care,
-potentially mitigating the burden of diabetes.
-
-The CDC’s Behavioral Risk Factor Surveillance System (BRFSS) provides
-extensive data on health-related risk behaviors, chronic health
-conditions, and preventive care usage across the U.S. This project
-leverages a cleaned 2015 BRFSS dataset to analyze key health and
-behavioral factors associated with diabetes and to build predictive
-models that identify individuals at elevated risk.
+\$327 billion annual burden on the healthcare system. The disease
+reduces life expectancy and quality of life while contributing to severe
+complications including heart disease, kidney failure, vision loss, and
+amputations. A significant challenge in diabetes management is
+underdiagnosis - 1 in 5 diabetics and 8 in 10 prediabetics are unaware
+of their condition. Therefore, early identification of at-risk
+individuals enables lifestyle modification and preventive care,
+potentially mitigating the burden of diabetes. We aim to discover in
+this study the relevant risk factors of diabetes to better understand
+predictive factors of diabetes. The CDC’s Behavioral Risk Factor
+Surveillance System (BRFSS) provides extensive data on health-related
+risk behaviors, chronic health conditions, and preventive care practices
+across the United States. Leveraging the cleaned 2015 BRFSS dataset,
+this project will: (1) identify key demographic, behavioral, and
+clinical factors associated with diabetes, (2) build predictive models
+to identify at-risk individuals, and (3) evaluate whether a reduced
+subset of survey questions can maintain predictive accuracy. By
+integrating statistical and machine learning approaches,we aim to
+support the development of accessible, cost-effective screening tools
+for early diabetes detection. This work has the potential to support the
+development of accessible, cost-effective tools for early diabetes
+detection and prevention in large populations, enabling population-level
+screening and earlier intervention among high-risk individuals.
 
 # Intended Final Products
+
+**Introduction page**: Overview of diabetes and study motivation,
+summary of the BRFSS dataset, and key variables used in the analysis.
+This page will introduce the research goals and data structure.
+
+**Statistical analysis page**: Description of the statistical methods,
+including logistic regression, subgroup and interaction analyses, and
+predictive modeling. This section will summarize key results such as
+adjusted odds ratios, ROC curves, and model diagnostics.
+
+**Visualizations page**: Interactive plots and charts showing the
+distribution of metabolic, behavioral, and demographic factors across
+diabetes groups. This will include histograms, boxplots, correlation
+heatmaps, and subgroup comparisons. Final report: A concise written
+summary of findings, interpretation of results, sensitivity checks, and
+public health implications related to metabolic and lifestyle risk
+factors for diabetes.
 
 # Data Description and Sources
 
 The
-[dataset](https://www.kaggle.com/datasets/alexteboul/diabetes-health-indicators-datascet)
+[dataset](https://www.kaggle.com/datasets/alexteboul/diabetes-health-indicators-dataset)
 is from BRFSS, an annual health-related telephone survey collected by
 CDC. This data is from the survey in 2015 that was collected from
-441,455 Americans. The original dataset has 330 features that are either
-directly from the responses of participants or calculated from their
-responses.
-
-**Target Variable**: Diabetes_binary — indicates diabetes presence (1 =
-prediabetes or diabetes, 0 = no diabetes).
-
-**Feature Variables** (21 total): Include health, lifestyle, and
-demographic indicators such as:
-
-- Medical: HighBP, HighChol, CholCheck, BMI
-- Behavioral: Smoker, PhysActivity, Fruits, Veggies, HvyAlcoholConsump
-- Demographic/Perception: Age, Education, Income, GenHlth, Sex,
-  MentHlth, PhysHlth, DiffWalk
+441,455 Americans. The original dataset has 330 variables covering
+medical, behavioral, and demographic indicators. Variables that are
+either directly from the responses of participants or calculated from
+their responses.  
+**Target Variable**: Diabetes_binary: indicates diabetes presence (1 =
+prediabetes or diabetes, 0 = no diabetes). **Feature Variables**:
+Medical: HighBP (High Blood Pressure), HighChol (High Cholesterol), BMI
+Behavioral: Smoker (at least 100 cigarettes in entire life), Fruits
+(Consume Fruit \>=1 times per day), Veggies (Consume Vegetables \>=1
+times per day), HvyAlcoholConsump (male \>=14 drinks/wk, female \>=7
+drinks/wk) Demographic/Perception: Age, Income, Sex
 
 # Planned Analyses/Visualizations
 
-Analysis: Linear regression
+**I. Exploring the Relationship Between Health Indicators and Diabetes
+Status**
 
-1.  Data Exploration and Preprocessing
-    - Examine data types, missing values, and class distribution
-    - Visualize distributions of key variables (BMI, age, general
-      health, etc.)
-    - Analyze correlations among features using heatmaps
-    - Compare characteristics of diabetic vs. non-diabetic respondents
-    - Handle potential outliers and perform normalization/scaling where
-      needed
-2.  Feature Engineering
-    - Encode categorical variables
-    - Create derived variables (e.g., BMI categories, age groups)
-    - Conduct feature selection using correlation, mutual information,
-      or model-based importance
-3.  Predictive Modeling
-    - Baseline models: Logistic Regression, Decision Tree
-    - Advanced models: Random Forest, XGBoost, Gradient Boosting,
-      Support Vector Machine
-    - Evaluation metrics: Accuracy, Precision, Recall, F1-score, ROC-AUC
-    - Address class imbalance (if using the unbalanced dataset) via
-      SMOTE or class weighting
-4.  Model Interpretation and Visualization
-    - Visualize model performance (ROC curves, confusion matrices)
-    - Identify key predictive features using feature importance plots or
-      SHAP values
-    - Display relationships such as
-      - BMI vs. diabetes risk
-      - Age group vs. diabetes prevalence
-      - Income/Education vs. diabetes probability
-5.  Optional Extensions
-    - Develop an interactive dashboard (Power BI, Tableau, or Dash)
-    - Build a simplified question-based predictor using top-ranked
-      features
+1.1 Distribution of Diabetes Status Across the Population A bar chart
+will display the proportion of individuals with and without diabetes.
+
+1.2 Comparison of Key Health Indicators by Diabetes Status Boxplots and
+violin plots will compare variables such as BMI, Age between diabetic
+and non-diabetic groups.
+
+1.3 Correlation Between Predictors A heatmap of the Pearson correlation
+coefficients among numeric predictors (e.g., BMI, age) will help
+identify multicollinearity and relationships among variables that may
+influence regression modeling.
+
+**II. Logistic Regression and Cross-sectional Analysis**
+
+2.1 Baseline Logistic Regression Model A binary logistic regression will
+be conducted with Diabetes_binary as the dependent variable and 10
+selected features as predictors. Odds ratios and 95% confidence
+intervals will be visualized using a forest plot, highlighting which
+factors significantly increase or decrease the likelihood of diabetes.
+
+2.2 Subgroup Analyses and Interaction Analyses Separate logistic
+regressions will be run for subgroups based on sex, age group, and
+income level, which will be summarized in comparative bar charts to
+observe how the strength and direction of associations vary across
+demographic groups. Interaction terms (e.g., Age × BMI) will be tested
+to explore dependencies.
+
+**III. Prediction and Model Evaluation**
+
+3.1 Model Performance and ROC Analysis The predictive ability of the
+logistic regression model will be evaluated using ROC curves and AUC
+scores. Confusion matrices and precision-recall curves will also be
+plotted for additional insight.
+
+3.2 Feature Importance Visualization A horizontal bar chart of
+standardized coefficients or SHAP values will rank the predictors by
+their relative contribution to diabetes prediction, providing an
+interpretable summary of key risk factors.
 
 # Coding Challenges
+
+During the course of this project, we expect to encounter several
+technical and analytical challenges, such as efficiently processing the
+large BRFSS dataset, addressing missing values and class imbalance, and
+implementing robust predictive and feature selection models in R.
+Particular attention will be given to optimizing computational
+performance, validating model accuracy, and ensuring transparency and
+reproducibility through well-documented and reproducible workflows.
 
 # Planned Timeline
 
 November 1-8: Data collection, cleaning, and preliminary exploration.
-November 9-15: November 16-22: November 23-30: Finalize data analysis
-and start on drafting the report. December 1-6: Complete draft report,
-with visualizations and interpretations. December 7-11: Review and
-finalize project report for submission.
+November 9-15: Exploratory analysis, feature engineering and
+visualization November 16-22: Model building and evaluation November
+23-30: Finalize data analysis and start on drafting the report. December
+1-6: Complete draft report, with visualizations and interpretations.
+December 7-11: Review and finalize project report for submission.
 
 # Project Structure
 
