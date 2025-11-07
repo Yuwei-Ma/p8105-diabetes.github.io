@@ -1,5 +1,6 @@
 ---
 title: "Final Project Proposal"
+author: Yuwei Ma, Rachel Lu, Chenxi Liu, Xiuhong Fan, Daisy Gui
 date: "2025-11-06"
 output: github_document
 ---

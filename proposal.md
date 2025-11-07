@@ -1,11 +1,15 @@
 Final Project Proposal
 ================
+Yuwei Ma, Rachel Lu, Chenxi Liu, Xiuhong Fan, Daisy Gui
 2025-11-06
 
 # Team Members
 
-Yuwei Ma (ym3138), Rachel Lu (cl4775) ,Chenxi Liu (cl4776), Xiuhong Fan
-(xf2302), Daisy Gui (yg3099)
+- Yuwei Ma (ym3138)
+- Rachel Lu (cl4775)
+- Chenxi Liu (cl4776)
+- Xiuhong Fan (xf2302)
+- Daisy Gui (yg3099)
 
 # Tentative Project Title
 
