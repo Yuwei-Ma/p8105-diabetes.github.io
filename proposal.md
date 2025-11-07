@@ -71,14 +71,17 @@ CDC. This data is from the survey in 2015 that was collected from
 441,455 Americans. The original dataset has 330 variables covering
 medical, behavioral, and demographic indicators. Variables that are
 either directly from the responses of participants or calculated from
-their responses.  
+their responses.
+
 **Target Variable**: Diabetes_binary: indicates diabetes presence (1 =
-prediabetes or diabetes, 0 = no diabetes). **Feature Variables**:
-Medical: HighBP (High Blood Pressure), HighChol (High Cholesterol), BMI
-Behavioral: Smoker (at least 100 cigarettes in entire life), Fruits
-(Consume Fruit \>=1 times per day), Veggies (Consume Vegetables \>=1
-times per day), HvyAlcoholConsump (male \>=14 drinks/wk, female \>=7
-drinks/wk) Demographic/Perception: Age, Income, Sex
+prediabetes or diabetes, 0 = no diabetes).
+
+**Feature Variables**: Medical: HighBP (High Blood Pressure), HighChol
+(High Cholesterol), BMI Behavioral: Smoker (at least 100 cigarettes in
+entire life), Fruits (Consume Fruit \>=1 times per day), Veggies
+(Consume Vegetables \>=1 times per day), HvyAlcoholConsump (male \>=14
+drinks/wk, female \>=7 drinks/wk) Demographic/Perception: Age, Income,
+Sex
 
 # Planned Analyses/Visualizations
 
