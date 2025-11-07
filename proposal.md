@@ -136,17 +136,32 @@ reproducibility through well-documented and reproducible workflows.
 
 # Planned Timeline
 
-November 1-8: Data collection, cleaning, and preliminary exploration.
-November 9-15: Exploratory analysis, feature engineering and
-visualization November 16-22: Model building and evaluation November
-23-30: Finalize data analysis and start on drafting the report. December
-1-6: Complete draft report, with visualizations and interpretations.
-December 7-11: Review and finalize project report for submission.
+- November 1-8: Data collection, cleaning, and preliminary exploration.
+- November 9-15: Exploratory analysis, feature engineering and
+  visualization
+- November 16-22: Model building and evaluation
+- November 23-30: Finalize data analysis and start on drafting the
+  report.
+- December 1-6: Complete draft report, with visualizations and
+  interpretations.
+- December 7-11: Review and finalize project report for submission.
 
 # Project Structure
 
 1.  Introduction:
+    - Background information on diabetes
+    - Source of the dataset, what it contains, and why it is suitable
+      for this analysis
 2.  Data Cleaning and Exploration:
+    - Explain how missing values or outliers are handled and summarize
+      key descriptive statistics and variable distributions.
 3.  Association and Survival Analysis:
+    - statistical tests to examine relationships between risk factors
+      and diabetes outcomes.
 4.  Results and Discussion:
+    - Present the main findings
+    - Figures/tables visualizations and interpret their implications in
+      context.
 5.  Recommendations:
+    - Provide practical insights or public health suggestions based on
+      the analysis results.
