@@ -48,29 +48,30 @@ Demographic/Perception: Age, Income, Sex
 **I. Exploring the Relationship Between Health Indicators and Diabetes Status**
 
 1.1 Distribution of Diabetes Status Across the Population
-A bar chart will display the proportion of individuals with and without diabetes. 
+A bar chart will display the proportion of diabetic vs. non-diabetic individuals. 
 
 1.2 Comparison of Key Health Indicators by Diabetes Status
-Boxplots and violin plots will compare variables such as BMI, Age between diabetic and non-diabetic groups. 
+Boxplots and violin plots will compare variables such as BMI and Age between diabetic and non-diabetic groups. 
 
-1.3 Correlation Between Predictors
-A heatmap of the Pearson correlation coefficients among numeric predictors (e.g., BMI, age) will help identify multicollinearity and relationships among variables that may influence regression modeling.
+1.3 Correlation Among Predictors
+Heatmap of the Pearson correlation coefficients among numeric predictors to identify multicollinearity.
 
 **II. Logistic Regression and Cross-sectional Analysis**
 
 2.1 Baseline Logistic Regression Model
-A binary logistic regression will be conducted with Diabetes_binary as the dependent variable and 10 selected features as predictors. Odds ratios and 95% confidence intervals will be visualized using a forest plot, highlighting which factors significantly increase or decrease the likelihood of diabetes.
+Binary logistic regression with diabetes status as outcome. Forest plots display odds ratio and 95% CIs for selected predictors.
 
-2.2 Subgroup Analyses and Interaction Analyses
-Separate logistic regressions will be run for subgroups based on sex, age group, and income level, which will be summarized in comparative bar charts to observe how the strength and direction of associations vary across demographic groups. Interaction terms (e.g., Age × BMI) will be tested to explore dependencies. 
+2.2 Subgroup and Interaction Analyses
+Stratified regression by demographic subgroups visualized with comparative bar charts. Interactive terms such as Age ✕ BMI explore effect modification.
 
 **III. Prediction and Model Evaluation**
 
-3.1 Model Performance and ROC Analysis
-The predictive ability of the logistic regression model will be evaluated using ROC curves and AUC scores. Confusion matrices and precision-recall curves will also be plotted for additional insight.
+3.1 Predictive Model Evaluation
+ROC curves, AUC scores, confusion matrices, and precision-recall curves. 
 
-3.2 Feature Importance Visualization
-A horizontal bar chart of standardized coefficients or SHAP values will rank the predictors by their relative contribution to diabetes prediction, providing an interpretable summary of key risk factors.
+3.2 Feature Importance Ranking
+Bar charts of standardized coefficients or SHAP values ranking predictor contributions.
+
 
 # Coding Challenges
 
