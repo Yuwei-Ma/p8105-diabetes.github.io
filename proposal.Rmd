@@ -23,13 +23,13 @@ Diabetes is one of the most prevalent chronic diseases in the United States, aff
 
 A significant concern is underdiagnosis. One in 5 diabetics and 8 in 10 prediabetics are unaware of their condition. Early identification of at-risk individuals enables lifestyle modification and preventive care, potentially mitigating the burden of diabetes.
 
-The CDC’s Behavioral Risk Factor Surveillance System (BRFSS) provides extensive data on health-related risk behaviors, chronic health conditions, and preventive care usage across the U.S. This project leverages a cleaned 2015 BRFSS dataset to analyze key health and behavioral factors associated with diabetes and to build predictive models that identify individuals at elevated risk.
+The CDC’s Behavioral Risk Factor Surveillance System (BRFSS) provides extensive data on health-related risk behaviors, chronic health conditions, and preventive care practices across the United States. Leveraging the cleaned 2015 BRFSS dataset, this project analyzes key demographic, behavioral, and clinical factors associated with diabetes and builds predictive models to identify individuals at elevated risk. By integrating statistical and machine learning approaches, the study aims to uncover the most influential risk factors and evaluate whether a reduced subset of survey questions can provide comparable predictive performance. The ultimate goal is to support the development of accessible, cost-effective tools for early diabetes detection and prevention in large populations.
 
 # Intended Final Products
 
 # Data Description and Sources
 
-The [dataset](https://www.kaggle.com/datasets/alexteboul/diabetes-health-indicators-datascet) is from BRFSS, an annual health-related telephone survey collected by CDC. This data is from the survey in 2015 that was collected from 441,455 Americans. The original dataset has 330 features that are either directly from the responses of participants or calculated from their responses.   
+The [dataset](https://www.kaggle.com/datasets/alexteboul/diabetes-health-indicators-dataset) is from BRFSS, an annual health-related telephone survey collected by CDC. This data is from the survey in 2015 that was collected from 441,455 Americans. The original dataset has 330 features that are either directly from the responses of participants or calculated from their responses.   
 
 **Target Variable**:
 Diabetes_binary — indicates diabetes presence (1 = prediabetes or diabetes, 0 = no diabetes).
@@ -75,10 +75,13 @@ e. Optional Extensions
 
 # Coding Challenges
 
+During the course of this project, we expect to encounter several technical and analytical challenges, such as efficiently processing the large BRFSS dataset, addressing missing values and class imbalance, and implementing robust predictive and feature selection models in R. Particular attention will be given to optimizing computational performance, validating model accuracy, and ensuring transparency and reproducibility through well-documented and reproducible workflows.
+
+
 # Planned Timeline
 November 1-8: Data collection, cleaning, and preliminary exploration.
-November 9-15: 
-November 16-22: 
+November 9-15: Exploratory analysis, feature engineering and visualization
+November 16-22: Model building and evaluation
 November 23-30: Finalize data analysis and start on drafting the report. 
 December 1-6: Complete draft report, with visualizations and interpretations. 
 December 7-11: Review and finalize project report for submission. 
