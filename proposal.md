@@ -1,0 +1,111 @@
+Final Project Proposal
+================
+2025-11-06
+
+# Team Members
+
+Yuwei Ma (ym3138), Rachel Lu (cl4775) ,Chenxi Liu (cl4776), Xiuhong Fan
+(xf2302), Daisy Gui (yg3099)
+
+# Tentative Project Title
+
+Predicting Diabetes Risk from Health and Behavioral Indicators
+
+# Motivation
+
+Diabetes is one of the most prevalent chronic diseases in the United
+States, affecting over 34 million Americans and placing an estimated
+\$327 billion annual burden on the healthcare system. The disease not
+only reduces life expectancy and quality of life but also contributes to
+severe complications such as heart disease, kidney failure, vision loss,
+and amputations.
+
+A significant concern is underdiagnosis. One in 5 diabetics and 8 in 10
+prediabetics are unaware of their condition. Early identification of
+at-risk individuals enables lifestyle modification and preventive care,
+potentially mitigating the burden of diabetes.
+
+The CDC’s Behavioral Risk Factor Surveillance System (BRFSS) provides
+extensive data on health-related risk behaviors, chronic health
+conditions, and preventive care usage across the U.S. This project
+leverages a cleaned 2015 BRFSS dataset to analyze key health and
+behavioral factors associated with diabetes and to build predictive
+models that identify individuals at elevated risk.
+
+# Intended Final Products
+
+# Data Description and Sources
+
+The
+[dataset](https://www.kaggle.com/datasets/alexteboul/diabetes-health-indicators-datascet)
+is from BRFSS, an annual health-related telephone survey collected by
+CDC. This data is from the survey in 2015 that was collected from
+441,455 Americans. The original dataset has 330 features that are either
+directly from the responses of participants or calculated from their
+responses.
+
+**Target Variable**: Diabetes_binary — indicates diabetes presence (1 =
+prediabetes or diabetes, 0 = no diabetes).
+
+**Feature Variables** (21 total): Include health, lifestyle, and
+demographic indicators such as:
+
+- Medical: HighBP, HighChol, CholCheck, BMI
+- Behavioral: Smoker, PhysActivity, Fruits, Veggies, HvyAlcoholConsump
+- Demographic/Perception: Age, Education, Income, GenHlth, Sex,
+  MentHlth, PhysHlth, DiffWalk
+
+# Planned Analyses/Visualizations
+
+Analysis: Linear regression
+
+1.  Data Exploration and Preprocessing
+    - Examine data types, missing values, and class distribution
+    - Visualize distributions of key variables (BMI, age, general
+      health, etc.)
+    - Analyze correlations among features using heatmaps
+    - Compare characteristics of diabetic vs. non-diabetic respondents
+    - Handle potential outliers and perform normalization/scaling where
+      needed
+2.  Feature Engineering
+    - Encode categorical variables
+    - Create derived variables (e.g., BMI categories, age groups)
+    - Conduct feature selection using correlation, mutual information,
+      or model-based importance
+3.  Predictive Modeling
+    - Baseline models: Logistic Regression, Decision Tree
+    - Advanced models: Random Forest, XGBoost, Gradient Boosting,
+      Support Vector Machine
+    - Evaluation metrics: Accuracy, Precision, Recall, F1-score, ROC-AUC
+    - Address class imbalance (if using the unbalanced dataset) via
+      SMOTE or class weighting
+4.  Model Interpretation and Visualization
+    - Visualize model performance (ROC curves, confusion matrices)
+    - Identify key predictive features using feature importance plots or
+      SHAP values
+    - Display relationships such as
+      - BMI vs. diabetes risk
+      - Age group vs. diabetes prevalence
+      - Income/Education vs. diabetes probability
+5.  Optional Extensions
+    - Develop an interactive dashboard (Power BI, Tableau, or Dash)
+    - Build a simplified question-based predictor using top-ranked
+      features
+
+# Coding Challenges
+
+# Planned Timeline
+
+November 1-8: Data collection, cleaning, and preliminary exploration.
+November 9-15: November 16-22: November 23-30: Finalize data analysis
+and start on drafting the report. December 1-6: Complete draft report,
+with visualizations and interpretations. December 7-11: Review and
+finalize project report for submission.
+
+# Project Structure
+
+1.  Introduction:
+2.  Data Cleaning and Exploration:
+3.  Association and Survival Analysis:
+4.  Results and Discussion:
+5.  Recommendations:
