@@ -7,9 +7,9 @@ navbar:
     - text: "Diabetes Risk Prediction Using Behavioral and Demographic Factors"
       href: index.html
     - text: "Full Report"
-      href: Full-Report.html
+      href: report.html
     - text: "Analysis & Code"
-      href: final_1205.html
+      href: p8105_final.html
     - text: "Screencast"
       href: Screencast.html
 
