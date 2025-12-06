@@ -6,7 +6,7 @@ output: github_document
 ---
 
 # P8105 Final Project: Diabetes Health Indicators
-
+ 
 **Task 1: Data Cleaning, Variable Processing, and Train/Test Dataset Creation**
 
 Dataset: CDC BRFSS 2015 Diabetes Health Indicators  
