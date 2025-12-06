@@ -42,7 +42,7 @@ The dataset has three versions:
 For this project, we'll use the full binary version for more data.
 
 ```{r import_data}
-diabetes_raw <- read_csv("diabetes_binary_health_indicators_BRFSS2015.csv")
+diabetes_raw <- read_csv("data/diabetes_binary_health_indicators_BRFSS2015.csv")
 
 glimpse(diabetes_raw)
 ```
