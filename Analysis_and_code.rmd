@@ -1,5 +1,5 @@
 ---
-title: "Final Project"
+title: "Analysis & Code"
 author: "Yuwei Ma, Rachel Lu, Chenxi Liu, Xiuhong Fan, Daisy Gui"
 date: "December 2025"
 output: html_document

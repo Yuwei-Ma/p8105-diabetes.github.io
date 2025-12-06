@@ -247,10 +247,10 @@ $(document).ready(function () {
   <a href="index.html">Diabetes Risk Prediction Using Behavioral and Demographic Factors</a>
 </li>
 <li>
-  <a href="Full-Report.html">Full Report</a>
+  <a href="Final_Project_Report.html">Final Project Report</a>
 </li>
 <li>
-  <a href="final_1205.html">Analysis &amp; Code</a>
+  <a href="Analysis_and_code.html">Analysis &amp; Code</a>
 </li>
 <li>
   <a href="Screencast.html">Screencast</a>
@@ -481,7 +481,7 @@ for class imbalance—such as class weighting or the use of evaluation
 metrics like AUC and precision–recall curves, which are more informative
 than accuracy alone. This initial visualization also provides a baseline
 picture of diabetes burden in the dataset.</p>
-<p><img src="report_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p><img src="Final_Project_Report_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
 </div>
 <div id="univariate-distributions-of-key-predictors"
 class="section level1">
@@ -494,7 +494,7 @@ extreme obesity, though such cases are relatively rare. Based on this
 pattern, we decided to retain BMI as a continuous predictor in our
 primary models while also planning sensitivity analyses using capped or
 transformed BMI to evaluate the influence of outliers.</p>
-<p><img src="report_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p><img src="Final_Project_Report_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
 <p><strong>Age and income</strong></p>
 <p>Because age and income are coded as ordered categories in BRFSS, they
 were summarized using bar plots of their categorical distributions. Age
@@ -506,8 +506,8 @@ variables as ordered categorical predictors—or potentially numeric
 scores reflecting their ordinal structure—rather than collapsing them
 into broad dichotomies that would obscure meaningful gradients in
 diabetes risk.
-<img src="report_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
-<p><img src="report_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<img src="Final_Project_Report_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p><img src="Final_Project_Report_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
 </div>
 <div id="comparisons-of-predictors-by-diabetes-status"
 class="section level1">
@@ -519,14 +519,14 @@ outliers exist in both groups, the clear upward shift for the diabetic
 group supports the well-established relationship between obesity and
 diabetes. This visualization reinforced our expectation that BMI will
 play a central role in our predictive models.</p>
-<p><img src="report_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<p><img src="Final_Project_Report_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
 <p><strong>Age by diabetes status</strong> Boxplots of the numeric age
 category show that the diabetic group is significantly older on average,
 with greater representation in the upper age categories. This strong age
 gradient supports including age as a key predictor and prompted us to
 consider potential interaction terms (e.g., Age × BMI) during model
 development.</p>
-<p><img src="report_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p><img src="Final_Project_Report_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
 <p><strong>General health by diabetes status</strong></p>
 <p>Self-reported general health (1 = excellent, 5 = poor) also differs
 notably by diabetes status. Individuals with diabetes tend to report
@@ -535,7 +535,7 @@ worse overall health, with higher medians and more responses in the
 insight, we plan to incorporate it cautiously into predictive models
 because it reflects downstream health consequences rather than upstream
 risk factors.</p>
-<p><img src="report_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<p><img src="Final_Project_Report_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
 </div>
 <div id="correlation-among-numeric-predictors" class="section level1">
 <h1>Correlation among numeric predictors</h1>
@@ -550,7 +550,7 @@ simultaneous inclusion of these predictors in multivariable logistic
 regression should not introduce severe multicollinearity. Understanding
 these relationships also helps us interpret coefficients and distinguish
 overlapping constructs.</p>
-<p><img src="report_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<p><img src="Final_Project_Report_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
 </div>
 <div id="how-eda-refined-our-analysis-plan" class="section level1">
 <h1>How EDA Refined Our Analysis Plan</h1>
@@ -589,7 +589,7 @@ modeling framework.</p>
 <h1>Fit Logistic Regression Models</h1>
 <div id="main-effects-model" class="section level2">
 <h2>Main Effects Model</h2>
-<p><img src="report_files/figure-html/unnamed-chunk-22-1.png" width="672" /></p>
+<p><img src="Final_Project_Report_files/figure-html/unnamed-chunk-22-1.png" width="672" /></p>
 <table>
 <caption>Final Multivariable Logistic Regression Model for Diabetes
 (JAMA/NEJM Style)</caption>
@@ -895,10 +895,10 @@ their effects were stronger among older adults. Poor self-rated health
 remained a robust predictor across age groups. These models reinforce
 earlier findings and highlight age-specific differences in
 vulnerability.</p>
-<p><img src="report_files/figure-html/unnamed-chunk-32-1.png" width="672" /></p>
-<p><img src="report_files/figure-html/unnamed-chunk-33-1.png" width="672" /></p>
-<p><img src="report_files/figure-html/unnamed-chunk-34-1.png" width="672" /></p>
-<p><img src="report_files/figure-html/unnamed-chunk-35-1.png" width="672" /></p>
+<p><img src="Final_Project_Report_files/figure-html/unnamed-chunk-32-1.png" width="672" /></p>
+<p><img src="Final_Project_Report_files/figure-html/unnamed-chunk-33-1.png" width="672" /></p>
+<p><img src="Final_Project_Report_files/figure-html/unnamed-chunk-34-1.png" width="672" /></p>
+<p><img src="Final_Project_Report_files/figure-html/unnamed-chunk-35-1.png" width="672" /></p>
 <p>To assess the predictive validity of our logistic regression
 framework, we conducted a comparative analysis of three candidate
 models: a Main Effects model, a Subgroup model (BMI × Age), and a High
