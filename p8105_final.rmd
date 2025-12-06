@@ -1,12 +1,13 @@
 ---
-title: "Task 1: Data Cleaning and Processing"
-author: "cl4775"
+title: "Final Project"
+author: "Yuwei Ma, Rachel Lu, Chenxi Liu, Xiuhong Fan, Daisy Gui"
 date: "December 2025"
 output: github_document
 ---
 
+
 # P8105 Final Project: Diabetes Health Indicators
- 
+
 **Task 1: Data Cleaning, Variable Processing, and Train/Test Dataset Creation**
 
 Dataset: CDC BRFSS 2015 Diabetes Health Indicators  
@@ -25,6 +26,7 @@ library(skimr)
 library(janitor)
 library(corrplot)
 library(DataExplorer)
+library(knitr)
 
 # Set seed for reproducibility
 set.seed(123)
@@ -276,10 +278,9 @@ saveRDS(diabetes_train, "data/diabetes_train.rds")
 saveRDS(diabetes_test, "data/diabetes_test.rds")
 ```
 
-## 8. Generate Data Dictionary
-
+## 8. Data Dictionary and Variable Summary
 ```{r data_dictionary}
-# Create data dictionary
+# Create and save data dictionary
 data_dictionary <- tribble(
   ~Variable, ~Type, ~Description, ~Values,
   "diabetes_binary", "Factor", "Diabetes diagnosis", "No_Diabetes, Diabetes",
@@ -309,12 +310,53 @@ data_dictionary <- tribble(
   "lifestyle_score", "Numeric", "Healthy lifestyle score", "0-3"
 )
 
-# Save data dictionary
 write_csv(data_dictionary, "data/data_dictionary.csv")
-
-# Display dictionary
-data_dictionary
 ```
+
+```{r variable-summary-table}
+# Create comprehensive variable summary table organized by category
+variables_summary <- tibble(
+  Category = c(
+    "Outcome",
+    "Health Conditions", "Health Conditions", "Health Conditions", "Health Conditions", "Health Conditions",
+    "Physical Metrics", "Physical Metrics", "Physical Metrics",
+    "Lifestyle", "Lifestyle", "Lifestyle", "Lifestyle", "Lifestyle",
+    "Health Status", "Health Status", "Health Status", "Health Status", "Health Status",
+    "Healthcare Access", "Healthcare Access",
+    "Demographics", "Demographics", "Demographics", "Demographics", "Demographics", "Demographics", "Demographics",
+    "Engineered Features", "Engineered Features"
+  ),
+  Variable = c(
+    "diabetes_binary",
+    "high_bp", "high_chol", "stroke", "heart_disease_or_attack", "chol_check",
+    "bmi", "bmi_category", "diff_walk",
+    "smoker", "phys_activity", "fruits", "veggies", "hvy_alcohol_consump",
+    "gen_hlth", "ment_hlth", "phys_hlth", "ment_hlth_cat", "phys_hlth_cat",
+    "any_healthcare", "no_docbc_cost",
+    "age", "age_cat", "sex", "education", "education_cat", "income", "income_cat",
+    "health_risk_score", "lifestyle_score"
+  ),
+  Description = c(
+    "No_Diabetes, Diabetes",
+    "High blood pressure (No, Yes)", "High cholesterol (No, Yes)", "History of stroke (No, Yes)", 
+    "History of heart disease or attack (No, Yes)", "Cholesterol check in past 5 years (No, Yes)",
+    "Body Mass Index (continuous)", "Underweight, Normal, Overweight, Obese", "Difficulty walking/climbing stairs (No, Yes)",
+    "Smoked 100+ cigarettes lifetime (No, Yes)", "Physical activity past 30 days (No, Yes)", 
+    "Consume fruit 1+ times/day (No, Yes)", "Consume vegetables 1+ times/day (No, Yes)", "Heavy alcohol consumption (No, Yes)",
+    "General health (1-5: Excellent to Poor)", "Days poor mental health past 30 days (0-30)", 
+    "Days poor physical health past 30 days (0-30)", "Mental health categories (None, 1-7, 8-14, 15-30 days)", 
+    "Physical health categories (None, 1-7, 8-14, 15-30 days)",
+    "Has healthcare coverage (No, Yes)", "Could not see doctor due to cost (No, Yes)",
+    "Age category (1-13)", "Age groups (18-24, 25-29, ..., 80+)", "Biological sex (Female, Male)", 
+    "Education level (1-6)", "Education categories", "Income level (1-8)", "Income categories (<$10k, ..., $75k+)",
+    "Composite health risk score (0-7)", "Healthy lifestyle score (0-3)"
+  )
+)
+
+kable(variables_summary, caption = "Dataset Variables by Category")
+```
+
+
 
 
 ## Exploratory analysis
@@ -547,5 +589,292 @@ Variables related to overall health, such as general health and physical or ment
 While BMI and age show only weak relationships with other predictors. 
 Overall, the plot confirms that each variable contributes distinct information for diabetes risk prediction.
 
+
+
+## Additional analysis 
+
+
+```{r}
+# 1. Generate Probabilities for All Models
+# -------------------------------------------------------
+probs_main <- predict(logit_main, diabetes_test, type = "response")
+probs_sub  <- predict(logit_subgroup, diabetes_test, type = "response")
+probs_int  <- predict(logit_interaction, diabetes_test, type = "response")
+```
+
+
+```{r}
+# Calculate ROC objects
+roc_main <- roc(diabetes_test$diabetes_binary, probs_main)
+roc_sub  <- roc(diabetes_test$diabetes_binary, probs_sub)
+roc_int  <- roc(diabetes_test$diabetes_binary, probs_int)
+
+# Print AUC values
+print(paste("AUC Main Effects:", auc(roc_main)))
+print(paste("AUC Subgroup:", auc(roc_sub)))
+print(paste("AUC Interaction:", auc(roc_int)))
+
+# Plot ROC Curves (using ggplot2 for better visuals)
+ggroc(list("Main Effects" = roc_main, 
+           "BMI × Age" = roc_sub, 
+           "Interaction" = roc_int)) +
+  scale_color_manual(values = c("#1f77b4", "#ff7f0e", "#2ca02c")) +
+  geom_abline(intercept = 0, slope = 1, color = "gray", linetype = "dashed") +
+  labs(title = "ROC Curves Comparison",
+       x = "Specificity",
+       y = "Sensitivity",
+       color = "Model") +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "bottom")
+
+# Threshold Tuning
+best_coords <- coords(roc_main, "best", best.method = "youden", 
+                      ret = c("threshold", "specificity", "sensitivity"))
+
+# Extract the numeric threshold safely (taking the first if there are ties)
+optimal_threshold <- as.numeric(best_coords$threshold[1])
+print(paste("Optimal Threshold found:", round(optimal_threshold, 4)))
+
+# Generate predictions using this new threshold
+preds_tuned <- factor(ifelse(probs_main > optimal_threshold, "Diabetes", "No_Diabetes"),
+                      levels = c("No_Diabetes", "Diabetes"))
+```
+
+
+```{r}
+# Calculate confusion matrix stats
+cm_tuned <- confusionMatrix(preds_tuned, diabetes_test$diabetes_binary, positive = "Diabetes")
+print(cm_tuned)
+
+# Visualizing the Confusion Matrix as a Heatmap
+cm_data <- as.data.frame(cm_tuned$table)
+
+ggplot(cm_data, aes(x = Prediction, y = Reference, fill = Freq)) +
+  geom_tile(color = "white") +
+  geom_text(aes(label = Freq), size = 6, color = "white") +
+  scale_fill_gradient(low = "#8ebad9", high = "#0b406c") +
+  labs(title = paste("Confusion Matrix (Threshold =", round(optimal_threshold, 3), ")"),
+       subtitle = "Optimized for Screening (Higher Sensitivity)",
+       x = "Predicted Label",
+       y = "Actual Label") +
+  theme_minimal(base_size = 14)
+```
+
+
+```{r}
+# Define the variables we want to keep and how to rename them
+# We map the R 'term' to a 'Clean_Name'
+plot_data <- tidy(logit_main) %>%
+  filter(term != "(Intercept)") %>%
+  mutate(
+    # Create a nice label for each technical term
+    Clean_Name = case_when(
+      # Medical Variables
+      str_detect(term, "high_bp") ~ "High Blood Pressure",
+      str_detect(term, "high_chol") ~ "High Cholesterol",
+      str_detect(term, "bmi_category\\.L") ~ "BMI Category (Increasing)", 
+      str_detect(term, "bmi") & !str_detect(term, "category") ~ "BMI (Continuous)",
+      
+      # Behavioral Variables
+      str_detect(term, "smoker") ~ "Smoker",
+      # Note: Fruits, Veggies, Alcohol were NOT in the logit_main model formula 
+      # so they won't appear here unless the model is refit. 
+      # We will display what is available from the current model.
+      
+      # Demographic Variables
+      str_detect(term, "age_cat\\.L") ~ "Age (Older)", # Keep only Linear (.L)
+      str_detect(term, "income_cat\\.L") ~ "Income (Higher)", # Keep only Linear (.L)
+      str_detect(term, "sexMale") ~ "Sex (Male)",
+      
+      # Everything else (Education, GenHlth, etc.) gets NA so we can drop it
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  # Remove variables we didn't define above (GenHlth, Education, .Q, .C terms)
+  filter(!is.na(Clean_Name)) %>% 
+  mutate(abs_effect = abs(estimate)) %>%
+  arrange(desc(abs_effect))
+
+# Plot the filtered top predictors
+ggplot(plot_data, aes(x = abs_effect, y = reorder(Clean_Name, abs_effect))) +
+  geom_col(fill = "#4C9F70", width = 0.7) +
+  geom_text(aes(label = round(abs_effect, 2)), hjust = -0.2, size = 4) + # Add values
+  labs(title = "Key Predictors of Diabetes",
+       subtitle = "Effect Size (Absolute Log-Odds)",
+       x = "Impact on Diabetes Risk",
+       y = NULL) +
+  theme_minimal(base_size = 14) +
+  theme(plot.margin = margin(10, 30, 10, 10)) + # Add room for text labels
+  xlim(0, max(plot_data$abs_effect) * 1.1) # Expand x-axis slightly
+```
+
+
+```{r, echo=FALSE}
+
+# Calibration Curve
+
+cal_data <- tibble(
+  obs = ifelse(diabetes_test$diabetes_binary == "Diabetes", 1, 0),
+  pred = probs_main
+) %>%
+  mutate(bin = ntile(pred, 10)) %>%
+  group_by(bin) %>%
+  summarise(mean_pred = mean(pred),
+            mean_obs = mean(obs))
+
+ggplot(cal_data, aes(x = mean_pred, y = mean_obs)) +
+  geom_point(size = 3, color = "#2C7BB6") +
+  geom_line(color = "#2C7BB6") +
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "gray") +
+  labs(title = "Calibration Curve (Main Effects)",
+       x = "Predicted Probability",
+       y = "Observed Proportion") +
+  theme_minimal(base_size = 14)
+```
+ 
+ 
+ 
+ 
+### Yuwei's part
+
+
+
+```{r}
+# 1. Generate Probabilities for All Models
+# -------------------------------------------------------
+probs_main <- predict(logit_main, diabetes_test, type = "response")
+probs_sub  <- predict(logit_subgroup, diabetes_test, type = "response")
+probs_int  <- predict(logit_interaction, diabetes_test, type = "response")
+```
+
+
+```{r}
+# Calculate ROC objects
+roc_main <- roc(diabetes_test$diabetes_binary, probs_main)
+roc_sub  <- roc(diabetes_test$diabetes_binary, probs_sub)
+roc_int  <- roc(diabetes_test$diabetes_binary, probs_int)
+
+# Print AUC values
+print(paste("AUC Main Effects:", auc(roc_main)))
+print(paste("AUC Subgroup:", auc(roc_sub)))
+print(paste("AUC Interaction:", auc(roc_int)))
+
+# Plot ROC Curves (using ggplot2 for better visuals)
+ggroc(list("Main Effects" = roc_main, 
+           "BMI × Age" = roc_sub, 
+           "Interaction" = roc_int)) +
+  scale_color_manual(values = c("#1f77b4", "#ff7f0e", "#2ca02c")) +
+  geom_abline(intercept = 0, slope = 1, color = "gray", linetype = "dashed") +
+  labs(title = "ROC Curves Comparison",
+       x = "Specificity",
+       y = "Sensitivity",
+       color = "Model") +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "bottom")
+
+# Threshold Tuning
+best_coords <- coords(roc_main, "best", best.method = "youden", 
+                      ret = c("threshold", "specificity", "sensitivity"))
+
+# Extract the numeric threshold safely (taking the first if there are ties)
+optimal_threshold <- as.numeric(best_coords$threshold[1])
+print(paste("Optimal Threshold found:", round(optimal_threshold, 4)))
+
+# Generate predictions using this new threshold
+preds_tuned <- factor(ifelse(probs_main > optimal_threshold, "Diabetes", "No_Diabetes"),
+                      levels = c("No_Diabetes", "Diabetes"))
+```
+
+
+```{r}
+# Calculate confusion matrix stats
+cm_tuned <- confusionMatrix(preds_tuned, diabetes_test$diabetes_binary, positive = "Diabetes")
+print(cm_tuned)
+
+# Visualizing the Confusion Matrix as a Heatmap
+cm_data <- as.data.frame(cm_tuned$table)
+
+ggplot(cm_data, aes(x = Prediction, y = Reference, fill = Freq)) +
+  geom_tile(color = "white") +
+  geom_text(aes(label = Freq), size = 6, color = "white") +
+  scale_fill_gradient(low = "#8ebad9", high = "#0b406c") +
+  labs(title = paste("Confusion Matrix (Threshold =", round(optimal_threshold, 3), ")"),
+       subtitle = "Optimized for Screening (Higher Sensitivity)",
+       x = "Predicted Label",
+       y = "Actual Label") +
+  theme_minimal(base_size = 14)
+```
+
+
+```{r}
+# Define the variables we want to keep and how to rename them
+# We map the R 'term' to a 'Clean_Name'
+plot_data <- tidy(logit_main) %>%
+  filter(term != "(Intercept)") %>%
+  mutate(
+    # Create a nice label for each technical term
+    Clean_Name = case_when(
+      # Medical Variables
+      str_detect(term, "high_bp") ~ "High Blood Pressure",
+      str_detect(term, "high_chol") ~ "High Cholesterol",
+      str_detect(term, "bmi_category\\.L") ~ "BMI Category (Increasing)", 
+      str_detect(term, "bmi") & !str_detect(term, "category") ~ "BMI (Continuous)",
+      
+      # Behavioral Variables
+      str_detect(term, "smoker") ~ "Smoker",
+      # Note: Fruits, Veggies, Alcohol were NOT in the logit_main model formula 
+      # so they won't appear here unless the model is refit. 
+      # We will display what is available from the current model.
+      
+      # Demographic Variables
+      str_detect(term, "age_cat\\.L") ~ "Age (Older)", # Keep only Linear (.L)
+      str_detect(term, "income_cat\\.L") ~ "Income (Higher)", # Keep only Linear (.L)
+      str_detect(term, "sexMale") ~ "Sex (Male)",
+      
+      # Everything else (Education, GenHlth, etc.) gets NA so we can drop it
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  # Remove variables we didn't define above (GenHlth, Education, .Q, .C terms)
+  filter(!is.na(Clean_Name)) %>% 
+  mutate(abs_effect = abs(estimate)) %>%
+  arrange(desc(abs_effect))
+
+# Plot the filtered top predictors
+ggplot(plot_data, aes(x = abs_effect, y = reorder(Clean_Name, abs_effect))) +
+  geom_col(fill = "#4C9F70", width = 0.7) +
+  geom_text(aes(label = round(abs_effect, 2)), hjust = -0.2, size = 4) + # Add values
+  labs(title = "Key Predictors of Diabetes",
+       subtitle = "Effect Size (Absolute Log-Odds)",
+       x = "Impact on Diabetes Risk",
+       y = NULL) +
+  theme_minimal(base_size = 14) +
+  theme(plot.margin = margin(10, 30, 10, 10)) + # Add room for text labels
+  xlim(0, max(plot_data$abs_effect) * 1.1) # Expand x-axis slightly
+```
+
+
+```{r, echo=FALSE}
+
+# Calibration Curve
+
+cal_data <- tibble(
+  obs = ifelse(diabetes_test$diabetes_binary == "Diabetes", 1, 0),
+  pred = probs_main
+) %>%
+  mutate(bin = ntile(pred, 10)) %>%
+  group_by(bin) %>%
+  summarise(mean_pred = mean(pred),
+            mean_obs = mean(obs))
+
+ggplot(cal_data, aes(x = mean_pred, y = mean_obs)) +
+  geom_point(size = 3, color = "#2C7BB6") +
+  geom_line(color = "#2C7BB6") +
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "gray") +
+  labs(title = "Calibration Curve (Main Effects)",
+       x = "Predicted Probability",
+       y = "Observed Proportion") +
+  theme_minimal(base_size = 14)
+```
 
  
