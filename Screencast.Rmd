@@ -4,5 +4,6 @@ author: "daisy_gui"
 output: html_document
 ---
 
+Pressed for time? specific See our hard work in action as Daisy breaks down our motivation, models, and results in just two minutes! 
 
 [Screencast](https://youtu.be/b1Hybi86YVs)
