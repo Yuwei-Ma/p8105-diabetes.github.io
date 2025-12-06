@@ -5,10 +5,17 @@ date: "December 2025"
 output: pdf_document
 ---
 
-
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  message = FALSE, 
+  warning = FALSE,
+  results = "hide"
+)
+```
 # P8105 Final Project: Diabetes Health Indicators
 
-```{r setup, message=FALSE, warning=FALSE}
+```{r setup2, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(caret)
 library(skimr)
@@ -18,14 +25,6 @@ library(DataExplorer)
 library(ggplot2)
 library(pROC)
 set.seed(123)
-```
-
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  echo = TRUE,
-  message = FALSE, 
-  warning = FALSE
-)
 ```
 
 ## 1. Motivation
@@ -70,7 +69,10 @@ In this project we would like to focus on these three questions:
 ## Data Cleaning
 
 
-```{r load_libraries}
+```{r, results='asis'}
+library(broom)
+library(dplyr)
+library(knitr)
 library(tidyverse)
 library(caret)
 library(skimr)
@@ -84,24 +86,22 @@ set.seed(123)
 
 ```{r import_data}
 diabetes_raw <- read_csv("data/diabetes_binary_health_indicators_BRFSS2015.csv")
-
-glimpse(diabetes_raw)
 ```
 
 
 ```{r explore_data}
 # Check for missing values
-colSums(is.na(diabetes_raw))
+#colSums(is.na(diabetes_raw))
 
 # Summary statistics
-summary(diabetes_raw)
+#summary(diabetes_raw)
 
 # Check for duplicates
-sum(duplicated(diabetes_raw))
+#sum(duplicated(diabetes_raw))
 
 # Examine outcome variable distribution
-table(diabetes_raw$Diabetes_binary)
-prop.table(table(diabetes_raw$Diabetes_binary))
+#table(diabetes_raw$Diabetes_binary)
+#prop.table(table(diabetes_raw$Diabetes_binary))
 ```
 
 ```{r clean_data}
@@ -118,7 +118,7 @@ diabetes_clean <- diabetes_raw %>%
   # Remove rows with missing values (if any)
   drop_na()
 
-glimpse(diabetes_clean)
+#glimpse(diabetes_clean)
 ```
 
 
@@ -220,20 +220,20 @@ diabetes_processed <- diabetes_clean %>%
       as.numeric(veggies == "Yes")
   )
 
-glimpse(diabetes_processed)
+#glimpse(diabetes_processed)
 ```
 
 ```{r quality_checks}
 # Check for any issues in processed data
-sum(is.na(diabetes_processed))
+#sum(is.na(diabetes_processed))
 
 # Verify factor levels
-table(diabetes_processed$diabetes_binary)
+#table(diabetes_processed$diabetes_binary)
 
 # Check continuous variables for outliers
 diabetes_processed %>%
-  select(bmi, ment_hlth, phys_hlth, health_risk_score, lifestyle_score) %>%
-  summary()
+  select(bmi, ment_hlth, phys_hlth, health_risk_score, lifestyle_score) #%>%
+  #summary()
 ```
 
 
@@ -258,8 +258,8 @@ nrow(diabetes_train)
 nrow(diabetes_test)
 
 # Check outcome distribution in train and test sets
-prop.table(table(diabetes_train$diabetes_binary))
-prop.table(table(diabetes_test$diabetes_binary))
+#prop.table(table(diabetes_train$diabetes_binary))
+#prop.table(table(diabetes_test$diabetes_binary))
 ```
 
 
@@ -316,7 +316,7 @@ data_dictionary <- tribble(
 write_csv(data_dictionary, "data/data_dictionary.csv")
 
 # Display dictionary
-data_dictionary
+#data_dictionary
 ```
 
 
@@ -790,7 +790,7 @@ data = diabetes_train,
 family = binomial()
 )
 
-summary(logit_main)
+# summary(logit_main)
 ```
 
 
@@ -802,7 +802,7 @@ data = diabetes_train,
 family = binomial()
 )
 
-summary(logit_subgroup)
+# summary(logit_subgroup)
 ```
 
 
@@ -814,7 +814,7 @@ data = diabetes_train,
 family = binomial()
 )
 
-summary(logit_interaction)
+# summary(logit_interaction)
 ```
 
 
