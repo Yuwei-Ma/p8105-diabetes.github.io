@@ -1,5 +1,5 @@
 ---
-title: "Screecast"
+title: "Screencast"
 author: "daisy_gui"
 output: html_document
 ---
