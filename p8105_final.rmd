@@ -542,8 +542,10 @@ cor_df %>%
 
 The heatmap shows that correlations among the numeric predictors are generally weak to moderate, indicating low multicollinearity and supporting their joint use in logistic regression models. 
 
-Variables related to overall health, such as general health and physical or mental health days, are moderately correlated as expected,
+Variables related to overall health, such as general health and physical or mental health days, are moderately correlated as expected.
 
 While BMI and age show only weak relationships with other predictors. 
 Overall, the plot confirms that each variable contributes distinct information for diabetes risk prediction.
 
+
+ 
