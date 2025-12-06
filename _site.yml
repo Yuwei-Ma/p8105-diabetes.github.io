@@ -1,0 +1,19 @@
+name: "final-project"
+output_dir: "."
+
+navbar:
+  title: "P8105 Final Project"
+  left:
+    - text: "Diabetes Risk Prediction Using Behavioral and Demographic Factors"
+      href: index.html
+    - text: "Full Report"
+      href: Full-Report.html
+    - text: "Analysis & Code"
+      href: final_1205.html
+    - text: "Screencast"
+      href: Screencast.html
+
+
+output:
+  html_document:
+    theme: cerulean

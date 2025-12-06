@@ -1,22 +1,651 @@
 ---
-title: "Yuwei's website"
-output: 
+title: "Diabetes Risk Prediction Using Behavioral and Demographic Factors"
+author: "daisy_gui"
+output:
   html_document:
     toc: true
     toc_float: true
+    theme: cerulean
 ---
 
-Hi, I'm **Yuwei** 👋  
-Welcome to my personal website! I'm a **biostatistics student** interested in **data science**.
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  message = FALSE, 
+  warning = FALSE
+)
+```
+
+# Motivation
+
+Diabetes is one of the most prevalent chronic diseases in the United States, affecting over 34 million Americans and placing an estimated $327 billion annual burden on the healthcare system. 
+
+The disease reduces life expectancy and quality of life while contributing to severe complications including heart disease, kidney failure, vision loss, and amputations. 
+
+A significant challenge in diabetes management is underdiagnosis. 1 in 5 diabetics and 8 in 10 prediabetics are unaware of their condition. Therefore, **early identification of at-risk individuals** enables lifestyle modification and preventive care, potentially mitigating the burden of diabetes. 
+
+```{r}
+library(tidyverse)
+library(caret)
+library(skimr)
+library(janitor)
+library(corrplot)
+library(DataExplorer)
+library(ggplot2)
+library(pROC)
+library(broom)
+set.seed(123)
+```
+
+```{r}
+diabetes_raw <- read_csv("data/diabetes_binary_health_indicators_BRFSS2015.csv")
+```
+
+```{r}
+diabetes_clean <- diabetes_raw %>%
+clean_names() %>%
+rename(heart_disease_or_attack = heart_diseaseor_attack) %>%
+distinct() %>%
+drop_na()
+```
+
+```{r}
+diabetes_processed <- diabetes_clean %>%
+mutate(
+diabetes_binary = factor(diabetes_binary,
+levels = c(0, 1),
+labels = c("No_Diabetes", "Diabetes")),
+
+high_bp = factor(high_bp, levels = c(0, 1), labels = c("No", "Yes")),
+high_chol = factor(high_chol, levels = c(0, 1), labels = c("No", "Yes")),
+chol_check = factor(chol_check, levels = c(0, 1), labels = c("No", "Yes")),
+smoker = factor(smoker, levels = c(0, 1), labels = c("No", "Yes")),
+stroke = factor(stroke, levels = c(0, 1), labels = c("No", "Yes")),
+heart_disease_or_attack = factor(heart_disease_or_attack, 
+                                 levels = c(0, 1), 
+                                 labels = c("No", "Yes")),
+phys_activity = factor(phys_activity, levels = c(0, 1), labels = c("No", "Yes")),
+fruits = factor(fruits, levels = c(0, 1), labels = c("No", "Yes")),
+veggies = factor(veggies, levels = c(0, 1), labels = c("No", "Yes")),
+hvy_alcohol_consump = factor(hvy_alcohol_consump, levels = c(0, 1), labels = c("No", "Yes")),
+any_healthcare = factor(any_healthcare, levels = c(0, 1), labels = c("No", "Yes")),
+no_docbc_cost = factor(no_docbc_cost, levels = c(0, 1), labels = c("No", "Yes")),
+diff_walk = factor(diff_walk, levels = c(0, 1), labels = c("No", "Yes")),
+sex = factor(sex, levels = c(0, 1), labels = c("Female", "Male")),
+
+gen_hlth_cat = factor(gen_hlth,
+                      levels = 1:5,
+                      labels = c("Excellent", "Very Good", "Good", "Fair", "Poor"),
+                      ordered = TRUE),
+
+age_cat = factor(age,
+                 levels = 1:13,
+                 labels = c("18-24", "25-29", "30-34", "35-39", "40-44",
+                            "45-49", "50-54", "55-59", "60-64", "65-69",
+                            "70-74", "75-79", "80+"),
+                 ordered = TRUE),
+
+education_cat = factor(education,
+                       levels = 1:6,
+                       labels = c("Never/K-8", "Grades 9-11", "Grade 12/GED",
+                                  "College 1-3 yrs", "College 4+ yrs", "Unknown"),
+                       ordered = TRUE),
+
+income_cat = factor(income,
+                    levels = 1:8,
+                    labels = c("<$10k", "$10k-$15k", "$15k-$20k", "$20k-$25k",
+                               "$25k-$35k", "$35k-$50k", "$50k-$75k", "$75k+"),
+                    ordered = TRUE),
+
+bmi_category = case_when(
+  bmi < 18.5 ~ "Underweight",
+  bmi >= 18.5 & bmi < 25 ~ "Normal",
+  bmi >= 25 & bmi < 30 ~ "Overweight",
+  bmi >= 30 ~ "Obese"
+) %>% factor(levels = c("Underweight", "Normal", "Overweight", "Obese"),
+             ordered = TRUE),
+
+ment_hlth_cat = case_when(
+  ment_hlth == 0 ~ "None",
+  ment_hlth <= 7 ~ "1-7 days",
+  ment_hlth <= 14 ~ "8-14 days",
+  ment_hlth <= 30 ~ "15-30 days"
+) %>% factor(levels = c("None", "1-7 days", "8-14 days", "15-30 days"),
+             ordered = TRUE),
+
+phys_hlth_cat = case_when(
+  phys_hlth == 0 ~ "None",
+  phys_hlth <= 7 ~ "1-7 days",
+  phys_hlth <= 14 ~ "8-14 days",
+  phys_hlth <= 30 ~ "15-30 days"
+) %>% factor(levels = c("None", "1-7 days", "8-14 days", "15-30 days"),
+             ordered = TRUE),
+
+health_risk_score = as.numeric(high_bp == "Yes") +
+  as.numeric(high_chol == "Yes") +
+  as.numeric(stroke == "Yes") +
+  as.numeric(heart_disease_or_attack == "Yes") +
+  as.numeric(smoker == "Yes") +
+  as.numeric(hvy_alcohol_consump == "Yes") +
+  (gen_hlth - 1) / 4,
+
+lifestyle_score = as.numeric(phys_activity == "Yes") +
+  as.numeric(fruits == "Yes") +
+  as.numeric(veggies == "Yes")
 
 
-- 🏠 This is the [home page](index.html).  
-- 🎓 Check out my [academic and professional experience](experience.html).  
-- 📊 Here's the [dashboard](flexdashboard.html) for NOAA dataset  
-- ℹ️ Learn more [about this site](about.html).
+)
+```
 
----
+```{r}
+# Train/test split
+set.seed(123)
 
-Here's a picture of Granny (I don't have either a cat or dog so I borrowed my friends Niki's dog Granny):
+train_index <- createDataPartition(
+diabetes_processed$diabetes_binary,
+p = 0.80,
+list = FALSE
+)
 
-![](image/granny.jpg){width=50%}
+diabetes_train <- diabetes_processed[train_index, ]
+diabetes_test  <- diabetes_processed[-train_index, ]
+```
+
+```{r}
+# Export Processed Datasets
+if (!dir.exists("data")) dir.create("data")
+
+write_csv(diabetes_processed, "data/diabetes_processed.csv")
+write_csv(diabetes_train, "data/diabetes_train.csv")
+write_csv(diabetes_test,  "data/diabetes_test.csv")
+
+saveRDS(diabetes_processed, "data/diabetes_processed.rds")
+saveRDS(diabetes_train, "data/diabetes_train.rds")
+saveRDS(diabetes_test,  "data/diabetes_test.rds")
+```
+
+```{r}
+# data directionary
+data_dictionary <- tribble(
+~Variable, ~Type, ~Description, ~Values,
+"diabetes_binary", "Factor", "Diabetes diagnosis", "No_Diabetes, Diabetes",
+"high_bp", "Factor", "High blood pressure", "No, Yes",
+"high_chol", "Factor", "High cholesterol", "No, Yes",
+"chol_check", "Factor", "Cholesterol check in past 5 years", "No, Yes",
+"bmi", "Numeric", "Body Mass Index", "Continuous",
+"smoker", "Factor", "Smoked 100+ cigarettes in life", "No, Yes",
+"stroke", "Factor", "History of stroke", "No, Yes",
+"heart_disease_or_attack", "Factor", "Coronary heart disease or MI", "No, Yes",
+"phys_activity", "Factor", "Physical activity in past 30 days", "No, Yes",
+"fruits", "Factor", "Consume fruit daily", "No, Yes",
+"veggies", "Factor", "Consume vegetables daily", "No, Yes",
+"hvy_alcohol_consump", "Factor", "Heavy alcohol use", "No, Yes",
+"any_healthcare", "Factor", "Have healthcare coverage", "No, Yes",
+"no_docbc_cost", "Factor", "Avoided doctor due to cost", "No, Yes",
+"gen_hlth", "Numeric", "General health rating", "1–5",
+"ment_hlth", "Numeric", "Poor mental health days", "0–30",
+"phys_hlth", "Numeric", "Poor physical health days", "0–30",
+"diff_walk", "Factor", "Difficulty walking", "No, Yes",
+"sex", "Factor", "Biological sex", "Female, Male",
+"age", "Numeric", "Age category", "1–13",
+"education", "Numeric", "Education level", "1–6",
+"income", "Numeric", "Income level", "1–8",
+"bmi_category", "Factor", "BMI category", "Underweight–Obese",
+"health_risk_score", "Numeric", "Composite health risk score", "0–7",
+"lifestyle_score", "Numeric", "Healthy lifestyle score", "0–3"
+)
+
+write_csv(data_dictionary, "data/data_dictionary.csv")
+```
+
+```{r}
+# Load processed data
+diabetes <- read_csv("data/diabetes_processed.csv") %>%
+  mutate(
+    diabetes_binary = factor(diabetes_binary,
+                             levels = c("No_Diabetes", "Diabetes"))
+  )
+```
+
+# Research Questions
+
+In this project we would like to focus on these three questions: 
+
+1. Which demographic, lifestyle, and clinical characteristics are most strongly associated with diabetes?
+
+2. How effectively can logistic regression models predict diabetes status using only self-reported survey information?
+
+3. Does model complexity like interaction terms improve predictive performance?
+
+# Data
+
+We use the cleaned [2015 BRFSS dataset](https://www.kaggle.com/datasets/alexteboul/diabetes-health-indicators-dataset/data) (253,680 adults, 22 variables), focusing on variables related to demographics, lifestyle, and self-reported health.
+
+- **Population:** Adults participating in the 2015 BRFSS survey.
+- **Outcome:** Self-reported diabetes status (binary outcome used for prediction).
+- **Main predictors:** BMI, age category, general health rating, blood pressure, cholesterol, smoking status, physical activity, sex, and socioeconomic indicators
+
+## Key preprocessing steps:
+
+- No missing data were present (already cleaned by BRFSS).
+
+- Created interpretable new variables according to [dataset notebook](https://www.kaggle.com/code/alexteboul/diabetes-health-indicators-dataset-notebook) and [codebook](https://www.cdc.gov/brfss/annual_data/2015/pdf/codebook15_llcp.pdf). 
+
+  - BMI categories
+
+  - Mental & physical health categories
+
+  - Composite lifestyle and health-risk scores
+
+  - Converted categorical variables into meaningful factor labels
+
+- Train/test Split
+
+  - 80/20 stratified split is used to preserve diabetes prevalence.
+  
+  - Training set: approximately 202,944 observations (for EDA and model fitting)
+  
+  - Test set: approximately 50,736 observations (for final evaluation only)
+
+- Fixed random seed (123) for reproducibility
+
+## Exploratory analysis revealed:
+
+- **Strong class imbalance (far more non-diabetic respondents).**
+
+```{r}
+# Distribution of Diabetes Status
+diabetes %>%
+  ggplot(aes(x = diabetes_binary, fill = diabetes_binary)) +
+  geom_bar(width = 0.55, alpha = 0.9, color = "white") +
+  scale_fill_manual(values = c("#5DA5DA", "#F17CB0")) + 
+  scale_y_continuous(
+    labels = scales::comma,
+    expand = expansion(mult = c(0, 0.05))
+  ) +
+  labs(
+    title = "Distribution of Diabetes Status",
+    x = "Diabetes Status",
+    y = "Count"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(size = 20, face = "bold", hjust = 0.5),
+    axis.title.x = element_text(size = 14, margin = margin(t = 10)),
+    axis.title.y = element_text(size = 14, margin = margin(r = 10)),
+    axis.text = element_text(size = 12),
+    legend.position = "none",
+    plot.margin = margin(15, 15, 15, 15)
+  )
+
+```
+
+According to this plot, diabetes individual included is much less than non-diabetes. This may lead to strong class imbalance. 
+
+```{r}
+# BMI Histogram
+diabetes %>%
+  ggplot(aes(x = bmi)) +
+  geom_histogram(bins = 40, fill = "#6495ED", alpha = 0.8) +
+  labs(
+    title = "Distribution of BMI",
+    x = "BMI",
+    y = "Count"
+  ) +
+  theme_minimal()
+```
+
+The BMI in this sample is right-skewed, with most values falling between 20 and 40. 
+
+The concentration of observations in the overweight and obese range reflects the population distribution in this dataset. A smaller number of individuals have very high BMI values, forming a long right tail.
+
+```{r}
+# Age Category Distribution
+diabetes %>%
+  ggplot(aes(x = age_cat)) +
+  geom_bar(fill = "#8B5FBF", alpha = 0.8) +
+  labs(
+    title = "Age Category Distribution",
+    x = "Age Category",
+    y = "Count"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+Left-skewness in this plot shows that the dataset contains far more middle-aged and older adults than younger respondents. Counts increase steadily from the 18–24 group and peak between ages 55–69, before gradually declining in the 70+ categories. This uneven age distribution is important because diabetes risk rises with age. This means that the sample naturally contains more individuals from higher-risk age groups.
+
+- **Diabetic individuals tend to have higher BMI, poor general health, and older age.**
+
+```{r}
+# BMI by Diabetes Status
+diabetes %>%
+  ggplot(aes(x = diabetes_binary, y = bmi, fill = diabetes_binary)) +
+  geom_boxplot(alpha = 0.85) +
+  scale_fill_manual(values = c("lightblue", "lightpink")) +
+  labs(
+    title = "BMI by Diabetes Status",
+    x = "Diabetes Status",
+    y = "BMI"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+The plot shows that individuals included with diabetes tend to have higher BMI values than those without diabetes. Both the median and overall distribution of diabetes group shifted upward. 
+
+```{r}
+# Age Category (Numeric) by Diabetes Status
+diabetes %>%
+  ggplot(aes(x = diabetes_binary, y = age, fill = diabetes_binary)) +
+  geom_boxplot(alpha = 0.85) +
+  labs(
+    title = "Age Category by Diabetes Status",
+    x = "Diabetes Status",
+    y = "Age Category (1 = 18–24 … 13 = 80+)"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+The plot shows that the median age category is higher for the diabetes group, and their overall distribution is shifted toward older age ranges.
+
+```{r}
+# General Health Score by Diabetes Status
+diabetes %>%
+  ggplot(aes(x = diabetes_binary, y = gen_hlth, fill = diabetes_binary)) +
+  geom_boxplot(alpha = 0.85) +
+  scale_fill_manual(values = c("#4C9F70", "#C94C4C")) +
+  labs(
+    title = "General Health Score by Diabetes Status",
+    x = "Diabetes Status",
+    y = "General Health (1 = Excellent, 5 = Poor)"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+The plot shows that individuals with diabetes generally report worse overall health than those without diabetes. The diabetes group has a higher median health score, which indicates poorer health and a distribution shifted toward less favorable health ratings.
+
+- **Income distribution is skewed toward higher brackets, which may influence access to care.**
+
+```{r}
+# Income Category Distribution
+diabetes %>%
+  ggplot(aes(x = income_cat)) +
+  geom_bar(fill = "#FFA500", alpha = 0.8) +
+  labs(
+    title = "Income Level Distribution",
+    x = "Income Category",
+    y = "Count"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r}
+# Correlation heat map
+# Select numeric variables
+numeric_vars <- diabetes %>%
+  select(bmi, ment_hlth, phys_hlth, gen_hlth, income, age)
+
+# Compute and tidy correlation matrix
+cor_df <- numeric_vars %>%
+  cor(use = "complete.obs") %>%
+  as.data.frame() %>%
+  rownames_to_column("var1") %>%
+  pivot_longer(-var1, names_to = "var2", values_to = "cor")
+
+# Heatmap with correlation values
+cor_df %>%
+  ggplot(aes(var1, var2, fill = cor)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient2(
+    low = "#4575b4",
+    high = "#d73027",
+    mid = "white",
+    midpoint = 0,
+    limits = c(-1, 1)
+  ) +
+  geom_text(aes(label = round(cor, 2)), size = 3) +
+  labs(
+    title = "Correlation Heatmap of Numeric Predictors",
+    x = "",
+    y = "",
+    fill = "Correlation"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+The heatmap shows that correlations among the numeric predictors are generally weak to moderate, indicating low multicollinearity and supporting their joint use in logistic regression models. 
+
+Variables related to overall health, such as general health and physical or mental health days, are moderately correlated as expected,
+
+While BMI and age show only weak relationships with other predictors. 
+Overall, the plot confirms that each variable contributes distinct information for diabetes risk prediction.
+
+# Key Findings
+
+## 1. Proposed Model Performed Best
+
+We compared three logistic regression models:
+
+- Main Effects Model
+
+- BMI × Age Interaction Model
+
+- High-Interaction Model
+
+The Main Effects Model achieved the highest predictive performance (AUC = 0.806 vs. 0,799 vs. 0.781) and best calibration.
+
+Adding interaction terms did not improve accuracy and sometimes reduced sensitivity, suggesting noise rather than signal was introduced.
+
+```{r}
+# Fit Logistic Regression Models
+# Main Effects Model
+logit_main <- glm(
+diabetes_binary ~ bmi + age_cat + gen_hlth_cat + high_bp + high_chol +
+phys_activity + smoker + heart_disease_or_attack + bmi_category +
+income_cat + education_cat + sex,
+data = diabetes_train,
+family = binomial()
+)
+```
+
+```{r}
+# Subgroup Model: BMI × Age Category
+logit_subgroup <- glm(
+diabetes_binary ~ bmi * age_cat + gen_hlth_cat + high_bp +
+phys_activity + smoker + income_cat + sex,
+data = diabetes_train,
+family = binomial()
+)
+```
+
+```{r}
+# High-Interaction Model
+logit_interaction <- glm(
+diabetes_binary ~ bmi * phys_activity * high_bp +
+gen_hlth_cat + smoker + heart_disease_or_attack + sex,
+data = diabetes_train,
+family = binomial()
+)
+```
+
+```{r}
+# Model Performance Evaluation
+# Utility Function
+library(pROC)
+
+evaluate_model <- function(model, data) {
+  probs <- predict(model, newdata = data, type = "response")
+  preds <- factor(ifelse(probs > 0.5, "Diabetes", "No_Diabetes"))
+  truth <- data$diabetes_binary
+  
+  cm <- confusionMatrix(preds, truth, positive = "Diabetes")
+  
+  tibble(
+    Accuracy    = cm$overall["Accuracy"],
+    Sensitivity = cm$byClass["Sensitivity"],
+    Specificity = cm$byClass["Specificity"],
+    AUC         = as.numeric(pROC::auc(truth, probs)) 
+  )
+}
+
+```
+
+```{r}
+# Compute Test Set Performance
+results_main <- evaluate_model(logit_main, diabetes_test)
+results_subgroup <- evaluate_model(logit_subgroup, diabetes_test)
+results_interaction <- evaluate_model(logit_interaction, diabetes_test)
+
+results_all <- bind_rows(
+"Main Effects" = results_main,
+"BMI × Age Subgroup" = results_subgroup,
+"Interaction Model" = results_interaction,
+.id = "Model"
+)
+```
+
+```{r}
+# ROC Curves for All Three Models
+probs_main <- predict(logit_main, diabetes_test, type = "response")
+probs_sub  <- predict(logit_subgroup, diabetes_test, type = "response")
+probs_int  <- predict(logit_interaction, diabetes_test, type = "response")
+
+roc_main <- roc(diabetes_test$diabetes_binary, probs_main)
+roc_sub  <- roc(diabetes_test$diabetes_binary, probs_sub)
+roc_int  <- roc(diabetes_test$diabetes_binary, probs_int)
+```
+
+```{r}
+# Variable Importance (Absolute Log-Odds Effect)
+var_imp <- function(model){
+broom::tidy(model) %>%
+filter(term != "(Intercept)") %>%
+mutate(abs_effect = abs(estimate)) %>%
+arrange(desc(abs_effect))
+}
+```
+
+```{r, include = FALSE}
+# Final Model Comparison Table
+results_all %>%
+mutate(across(where(is.numeric), round, 3))
+```
+
+```{r}
+## Predictive model evaluation (ROC/AUC, confusion matrix, feature importance)
+# 1. Generate Probabilities for All Models
+# -------------------------------------------------------
+probs_main <- predict(logit_main, diabetes_test, type = "response")
+probs_sub  <- predict(logit_subgroup, diabetes_test, type = "response")
+probs_int  <- predict(logit_interaction, diabetes_test, type = "response")
+```
+
+```{r}
+# Calculate ROC objects
+roc_main <- roc(diabetes_test$diabetes_binary, probs_main)
+roc_sub  <- roc(diabetes_test$diabetes_binary, probs_sub)
+roc_int  <- roc(diabetes_test$diabetes_binary, probs_int)
+
+# Plot ROC Curves
+ggroc(list("Main Effects" = roc_main, 
+           "BMI × Age" = roc_sub, 
+           "Interaction" = roc_int)) +
+  scale_color_manual(values = c("#1f77b4", "#ff7f0e", "#2ca02c")) +
+  geom_abline(intercept = 0, slope = 1, color = "gray", linetype = "dashed") +
+  labs(title = "ROC Curves Comparison",
+       x = "Specificity",
+       y = "Sensitivity",
+       color = "Model") +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "bottom")
+
+# Threshold Tuning
+best_coords <- coords(roc_main, "best", best.method = "youden", 
+                      ret = c("threshold", "specificity", "sensitivity"))
+
+# Extract the numeric threshold safely (taking the first if there are ties)
+optimal_threshold <- as.numeric(best_coords$threshold[1])
+
+# Generate predictions using this new threshold
+preds_tuned <- factor(ifelse(probs_main > optimal_threshold, "Diabetes", "No_Diabetes"),
+                      levels = c("No_Diabetes", "Diabetes"))
+```
+
+The ROC curves show that the Main Effects model consistently achieves the highest sensitivity across specificity levels. This confirms its better discrimination ability compared with the BMI × Age and High-Interaction models. 
+
+The two more complex models both produce slightly lower ROC curves. Additional interaction terms introduced noise and did not improve predictive performance. 
+
+The simpler Main Effects model is the most effective and reliable choice for diabetes risk prediction.
+
+## 2. Significant Predictors of Diabetes
+
+The variables most strongly associated with diabetes were:
+
+- age level
+- general health rating
+- BMI
+- high blood pressure
+- high cholesterol
+- socioeconomic indicators
+
+```{r}
+# Main Effects Model
+
+tidy(logit_main) %>%
+  filter(term != "(Intercept)") %>%
+  mutate(abs_effect = abs(estimate),
+         term = str_remove_all(term, "cat|factor|\\(|\\)")) %>% 
+  slice_max(order_by = abs_effect, n = 10) %>%
+  ggplot(aes(x = abs_effect, y = reorder(term, abs_effect))) +
+  geom_col(fill = "#4C9F70", width = 0.7) +
+  labs(title = "Top 10 Predictors of Diabetes Risk",
+       subtitle = "Based on Absolute Log-Odds",
+       x = "Effect Size (Absolute Log-Odds)",
+       y = NULL) +   
+  theme_minimal(base_size = 14) 
+```
+
+These findings align with established clinical literature, which means they support the external validity of our model.
+
+## 3. Importance of Adjusting the Classification Threshold
+
+Diabetes is relatively rare in this dataset. The default probability cutoff of 0.5 produced **high accuracy (~85%) and dangerously low sensitivity (~15%)**. 
+
+Adjusting the threshold using **Youden’s Index (~0.14)** significantly **improved sensitivity** while maintaining acceptable specificity. This improved the model in ability of identifying high-risk individuals from public health screening.
+
+```{r}
+# Calculate confusion matrix stats
+cm_tuned <- confusionMatrix(preds_tuned, diabetes_test$diabetes_binary, positive = "Diabetes")
+
+# Visualizing the Confusion Matrix as a Heatmap
+cm_data <- as.data.frame(cm_tuned$table)
+
+ggplot(cm_data, aes(x = Prediction, y = Reference, fill = Freq)) +
+  geom_tile(color = "white") +
+  geom_text(aes(label = Freq), size = 6, color = "white") +
+  scale_fill_gradient(low = "#8ebad9", high = "#0b406c") +
+  labs(title = paste("Confusion Matrix (Threshold =", round(optimal_threshold, 3), ")"),
+       subtitle = "Optimized for Screening (Higher Sensitivity)",
+       x = "Predicted Label",
+       y = "Actual Label") +
+  theme_minimal(base_size = 14)
+```
+
+This confusion matrix illustrates the performance of the Main Effects model after lowering the decision threshold to 0.141. 
+
+With this threshold, the model correctly identifies far more true diabetes cases (1,480) than at the default threshold, though at the cost of increasing false positives (12,467). 
+
+This trade-off is more appropriate for screening, as missing true cases is more harmful than referring additional individuals for follow-up testing.
+
+## 4. Takeaway Messages
+
+According to our model, predictors from a short list of survey questions that are included in our model, especially **age, general health rating, BMI**, may be able to provide reliable early risk stratification without clinical testing.
+
+**A straightforward model using basic survey questions can still pick out individuals who are at higher risk for diabetes reliably. Making the current model more complicated didn’t improve the model.**
+
+**This means early diabetes screening could be done with quick survey data before medical tests, which makes the screening more affordable and accessible.**

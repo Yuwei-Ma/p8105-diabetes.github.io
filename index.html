@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="daisy_gui" />
+
+
+<title>Diabetes Risk Prediction Using Behavioral and Demographic Factors</title>
+
+<script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">P8105 Final Project</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Diabetes Risk Prediction Using Behavioral and Demographic Factors</a>
+</li>
+<li>
+  <a href="report.html">Full Report</a>
+</li>
+<li>
+  <a href="final_1202.html">Analysis &amp; Code</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Diabetes Risk Prediction Using Behavioral
+and Demographic Factors</h1>
+<h4 class="author">daisy_gui</h4>
+
+</div>
+
+
+<div id="motivation" class="section level1">
+<h1>Motivation</h1>
+<p>Diabetes is one of the most prevalent chronic diseases in the United
+States, affecting over 34 million Americans and placing an estimated
+$327 billion annual burden on the healthcare system.</p>
+<p>The disease reduces life expectancy and quality of life while
+contributing to severe complications including heart disease, kidney
+failure, vision loss, and amputations.</p>
+<p>A significant challenge in diabetes management is underdiagnosis. 1
+in 5 diabetics and 8 in 10 prediabetics are unaware of their condition.
+Therefore, <strong>early identification of at-risk individuals</strong>
+enables lifestyle modification and preventive care, potentially
+mitigating the burden of diabetes.</p>
+</div>
+<div id="research-questions" class="section level1">
+<h1>Research Questions</h1>
+<p>In this project we would like to focus on these three questions:</p>
+<ol style="list-style-type: decimal">
+<li><p>Which demographic, lifestyle, and clinical characteristics are
+most strongly associated with diabetes?</p></li>
+<li><p>How effectively can logistic regression models predict diabetes
+status using only self-reported survey information?</p></li>
+<li><p>Does model complexity like interaction terms improve predictive
+performance?</p></li>
+</ol>
+</div>
+<div id="data" class="section level1">
+<h1>Data</h1>
+<p>We use the cleaned <a
+href="https://www.kaggle.com/datasets/alexteboul/diabetes-health-indicators-dataset/data">2015
+BRFSS dataset</a> (253,680 adults, 22 variables), focusing on variables
+related to demographics, lifestyle, and self-reported health.</p>
+<ul>
+<li><strong>Population:</strong> Adults participating in the 2015 BRFSS
+survey.</li>
+<li><strong>Outcome:</strong> Self-reported diabetes status (binary
+outcome used for prediction).</li>
+<li><strong>Main predictors:</strong> BMI, age category, general health
+rating, blood pressure, cholesterol, smoking status, physical activity,
+sex, and socioeconomic indicators</li>
+</ul>
+<div id="key-preprocessing-steps" class="section level2">
+<h2>Key preprocessing steps:</h2>
+<ul>
+<li><p>No missing data were present (already cleaned by BRFSS).</p></li>
+<li><p>Created interpretable new variables according to <a
+href="https://www.kaggle.com/code/alexteboul/diabetes-health-indicators-dataset-notebook">dataset
+notebook</a> and <a
+href="https://www.cdc.gov/brfss/annual_data/2015/pdf/codebook15_llcp.pdf">codebook</a>.</p>
+<ul>
+<li><p>BMI categories</p></li>
+<li><p>Mental &amp; physical health categories</p></li>
+<li><p>Composite lifestyle and health-risk scores</p></li>
+<li><p>Converted categorical variables into meaningful factor
+labels</p></li>
+</ul></li>
+<li><p>Train/test Split</p>
+<ul>
+<li><p>80/20 stratified split is used to preserve diabetes
+prevalence.</p></li>
+<li><p>Training set: approximately 202,944 observations (for EDA and
+model fitting)</p></li>
+<li><p>Test set: approximately 50,736 observations (for final evaluation
+only)</p></li>
+</ul></li>
+<li><p>Fixed random seed (123) for reproducibility</p></li>
+</ul>
+</div>
+<div id="exploratory-analysis-revealed" class="section level2">
+<h2>Exploratory analysis revealed:</h2>
+<ul>
+<li><strong>Strong class imbalance (far more non-diabetic
+respondents).</strong></li>
+</ul>
+<p><img src="index_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p>According to this plot, diabetes individual included is much less
+than non-diabetes. This may lead to strong class imbalance.</p>
+<p><img src="index_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p>The BMI in this sample is right-skewed, with most values falling
+between 20 and 40.</p>
+<p>The concentration of observations in the overweight and obese range
+reflects the population distribution in this dataset. A smaller number
+of individuals have very high BMI values, forming a long right tail.</p>
+<p><img src="index_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p>Left-skewness in this plot shows that the dataset contains far more
+middle-aged and older adults than younger respondents. Counts increase
+steadily from the 18–24 group and peak between ages 55–69, before
+gradually declining in the 70+ categories. This uneven age distribution
+is important because diabetes risk rises with age. This means that the
+sample naturally contains more individuals from higher-risk age
+groups.</p>
+<ul>
+<li><strong>Diabetic individuals tend to have higher BMI, poor general
+health, and older age.</strong></li>
+</ul>
+<p><img src="index_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p>The plot shows that individuals included with diabetes tend to have
+higher BMI values than those without diabetes. Both the median and
+overall distribution of diabetes group shifted upward.</p>
+<p><img src="index_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p>The plot shows that the median age category is higher for the
+diabetes group, and their overall distribution is shifted toward older
+age ranges.</p>
+<p><img src="index_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<p>The plot shows that individuals with diabetes generally report worse
+overall health than those without diabetes. The diabetes group has a
+higher median health score, which indicates poorer health and a
+distribution shifted toward less favorable health ratings.</p>
+<ul>
+<li><strong>Income distribution is skewed toward higher brackets, which
+may influence access to care.</strong></li>
+</ul>
+<p><img src="index_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p><img src="index_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<p>The heatmap shows that correlations among the numeric predictors are
+generally weak to moderate, indicating low multicollinearity and
+supporting their joint use in logistic regression models.</p>
+<p>Variables related to overall health, such as general health and
+physical or mental health days, are moderately correlated as
+expected,</p>
+<p>While BMI and age show only weak relationships with other predictors.
+Overall, the plot confirms that each variable contributes distinct
+information for diabetes risk prediction.</p>
+</div>
+</div>
+<div id="key-findings" class="section level1">
+<h1>Key Findings</h1>
+<div id="proposed-model-performed-best" class="section level2">
+<h2>1. Proposed Model Performed Best</h2>
+<p>We compared three logistic regression models:</p>
+<ul>
+<li><p>Main Effects Model</p></li>
+<li><p>BMI × Age Interaction Model</p></li>
+<li><p>High-Interaction Model</p></li>
+</ul>
+<p>The Main Effects Model achieved the highest predictive performance
+(AUC = 0.806 vs. 0,799 vs. 0.781) and best calibration.</p>
+<p>Adding interaction terms did not improve accuracy and sometimes
+reduced sensitivity, suggesting noise rather than signal was
+introduced.</p>
+<p><img src="index_files/figure-html/unnamed-chunk-26-1.png" width="672" /></p>
+<p>The ROC curves show that the Main Effects model consistently achieves
+the highest sensitivity across specificity levels. This confirms its
+better discrimination ability compared with the BMI × Age and
+High-Interaction models.</p>
+<p>The two more complex models both produce slightly lower ROC curves.
+Additional interaction terms introduced noise and did not improve
+predictive performance.</p>
+<p>The simpler Main Effects model is the most effective and reliable
+choice for diabetes risk prediction.</p>
+</div>
+<div id="significant-predictors-of-diabetes" class="section level2">
+<h2>2. Significant Predictors of Diabetes</h2>
+<p>The variables most strongly associated with diabetes were:</p>
+<ul>
+<li>age level</li>
+<li>general health rating</li>
+<li>BMI</li>
+<li>high blood pressure</li>
+<li>high cholesterol</li>
+<li>socioeconomic indicators</li>
+</ul>
+<p><img src="index_files/figure-html/unnamed-chunk-27-1.png" width="672" /></p>
+<p>These findings align with established clinical literature, which
+means they support the external validity of our model.</p>
+</div>
+<div id="importance-of-adjusting-the-classification-threshold"
+class="section level2">
+<h2>3. Importance of Adjusting the Classification Threshold</h2>
+<p>Diabetes is relatively rare in this dataset. The default probability
+cutoff of 0.5 produced <strong>high accuracy (~85%) and dangerously low
+sensitivity (~15%)</strong>.</p>
+<p>Adjusting the threshold using <strong>Youden’s Index (~0.14)</strong>
+significantly <strong>improved sensitivity</strong> while maintaining
+acceptable specificity. This improved the model in ability of
+identifying high-risk individuals from public health screening.</p>
+<p><img src="index_files/figure-html/unnamed-chunk-28-1.png" width="672" /></p>
+<p>This confusion matrix illustrates the performance of the Main Effects
+model after lowering the decision threshold to 0.141.</p>
+<p>With this threshold, the model correctly identifies far more true
+diabetes cases (1,480) than at the default threshold, though at the cost
+of increasing false positives (12,467).</p>
+<p>This trade-off is more appropriate for screening, as missing true
+cases is more harmful than referring additional individuals for
+follow-up testing.</p>
+</div>
+<div id="takeaway-messages" class="section level2">
+<h2>4. Takeaway Messages</h2>
+<p>According to our model, predictors from a short list of survey
+questions that are included in our model, especially <strong>age,
+general health rating, BMI</strong>, may be able to provide reliable
+early risk stratification without clinical testing.</p>
+<p><strong>A straightforward model using basic survey questions can
+still pick out individuals who are at higher risk for diabetes reliably.
+Making the current model more complicated didn’t improve the
+model.</strong></p>
+<p><strong>This means early diabetes screening could be done with quick
+survey data before medical tests, which makes the screening more
+affordable and accessible.</strong></p>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
