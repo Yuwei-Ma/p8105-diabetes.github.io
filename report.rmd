@@ -939,7 +939,7 @@ logit_core <- glm(
 summary(logit_core)
 ```
  
-```{r}
+```{r, results='asis'}
 library(broom)
 library(dplyr)
 library(knitr)
