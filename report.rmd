@@ -16,6 +16,7 @@ library(janitor)
 library(corrplot)
 library(DataExplorer)
 library(ggplot2)
+library(pROC)
 set.seed(123)
 ```
 
@@ -395,7 +396,7 @@ Engineered Features:
 
 
 ```{r,include = FALSE}
-diabetes_raw <- read_csv("diabetes_binary_health_indicators_BRFSS2015.csv")
+diabetes_raw <- read_csv("data/diabetes_binary_health_indicators_BRFSS2015.csv")
 ```
 
 ```{r,include = FALSE}
@@ -758,6 +759,263 @@ The strong imbalance between diabetic and non-diabetic respondents underscored t
 EDA also helped us differentiate variables that are best suited for descriptive characterization from those that function as meaningful predictors of diabetes risk. For instance, general health scores showed strong associations with diabetes status but represent downstream consequences of underlying risk factors. As a result, we plan to use such variables primarily for descriptive insight while emphasizing upstream, behaviorally and demographically grounded predictors in our modeling framework.
 
 ## Additional Analysis
+
+# Fit Logistic Regression Models
+```{r}
+diabetes_train_model <- diabetes_train %>%
+  mutate(
+    bmi_c = bmi - mean(bmi, na.rm = TRUE),
+
+    age_cat        = fct_relevel(age_cat, "18-24"),
+    gen_hlth_cat   = fct_relevel(gen_hlth_cat, "Excellent"),
+    bmi_category   = fct_relevel(bmi_category, "Normal"),
+    income_cat     = fct_relevel(income_cat, "$75k+"),
+    education_cat  = fct_relevel(education_cat, "College 4+ yrs"),
+    sex            = fct_relevel(sex, "Female"),
+    high_bp        = fct_relevel(high_bp, "No"),
+    high_chol      = fct_relevel(high_chol, "No"),
+    phys_activity  = fct_relevel(phys_activity, "No"),
+    smoker         = fct_relevel(smoker, "No"),
+    heart_disease_or_attack = fct_relevel(heart_disease_or_attack, "No")
+  )
+```
+
+## Main Effects Model
+```{r}
+logit_main <- glm(
+diabetes_binary ~ bmi + age_cat + gen_hlth_cat + high_bp + high_chol +
+phys_activity + smoker + heart_disease_or_attack + bmi_category +
+income_cat + education_cat + sex,
+data = diabetes_train,
+family = binomial()
+)
+
+summary(logit_main)
+```
+
+
+```{r}
+logit_subgroup <- glm(
+diabetes_binary ~ bmi * age_cat + gen_hlth_cat + high_bp +
+phys_activity + smoker + income_cat + sex,
+data = diabetes_train,
+family = binomial()
+)
+
+summary(logit_subgroup)
+```
+
+
+```{r}
+logit_interaction <- glm(
+diabetes_binary ~ bmi * phys_activity * high_bp +
+gen_hlth_cat + smoker + heart_disease_or_attack + sex,
+data = diabetes_train,
+family = binomial()
+)
+
+summary(logit_interaction)
+```
+
+
+```{r}
+library(splines)
+
+logit_spline <- glm(
+  diabetes_binary ~ ns(bmi, df = 4) +
+    age_cat + gen_hlth_cat + high_bp + smoker + income_cat + sex,
+  data = diabetes_train_model,
+  family = binomial()
+)
+
+summary(logit_spline)
+bmi_range <- seq(min(diabetes_train$bmi), max(diabetes_train$bmi), length = 100)
+
+pred_df <- tibble(
+  bmi = bmi_range,
+  age_cat = "18-24",
+  gen_hlth_cat = "Excellent",
+  high_bp = "No",
+  smoker = "No",
+  income_cat = "$75k+",
+  sex = "Female"
+)
+
+pred_df$pred <- predict(logit_spline, newdata = pred_df, type = "response")
+
+pred_df %>%
+  ggplot(aes(bmi, pred)) +
+  geom_line(color = "blue") +
+  labs(title = "Nonlinear BMI–Diabetes Risk Curve (Spline Model)")
+```
+
+
+```{r}
+logit_bmi_sex <- glm(
+  diabetes_binary ~ bmi_c * sex + age_cat + high_bp + gen_hlth_cat,
+  data = diabetes_train_model,
+  family = binomial()
+)
+
+summary(logit_bmi_sex)
+coef(logit_bmi_sex)[grep("bmi_c", names(coef(logit_bmi_sex)))]
+```
+
+
+```{r}
+logit_income_health <- glm(
+  diabetes_binary ~ income_cat * gen_hlth_cat +
+    age_cat + bmi_c + high_bp + high_chol,
+  data = diabetes_train_model,
+  family = binomial()
+)
+
+summary(logit_income_health)
+```
+
+
+```{r}
+logit_mental_activity <- glm(
+  diabetes_binary ~ ment_hlth_cat * phys_activity +
+    bmi_c + age_cat + high_bp + high_chol + smoker,
+  data = diabetes_train_model,
+  family = binomial()
+)
+
+summary(logit_mental_activity)
+```
+
+
+```{r}
+logit_multi_morbidity <- glm(
+  diabetes_binary ~ health_risk_score + age_cat + income_cat + sex,
+  data = diabetes_train_model,
+  family = binomial()
+)
+
+summary(logit_multi_morbidity)
+```
+
+
+```{r}
+logit_lifestyle <- glm(
+  diabetes_binary ~ lifestyle_score + age_cat + bmi_c +
+    high_bp + gen_hlth_cat + income_cat,
+  data = diabetes_train_model,
+  family = binomial()
+)
+
+summary(logit_lifestyle)
+```
+
+
+```{r}
+young_group <- diabetes_train_model %>%
+  filter(age_cat %in% c("18-24","25-29","30-34"))
+
+old_group <- diabetes_train_model %>%
+  filter(age_cat %in% c("60-64","65-69","70-74","75-79","80+"))
+logit_young <- glm(
+  diabetes_binary ~ bmi_c + gen_hlth_cat + high_bp,
+  data = young_group, family = binomial()
+)
+
+logit_old <- glm(
+  diabetes_binary ~ bmi_c + gen_hlth_cat + high_bp,
+  data = old_group, family = binomial()
+)
+
+summary(logit_young)
+summary(logit_old)
+```
+ 
+```{r}
+logit_core <- glm(
+  diabetes_binary ~ bmi_c + age_cat + high_bp + gen_hlth_cat + sex,
+  data = diabetes_train_model,
+  family = binomial()
+)
+
+summary(logit_core)
+```
+ 
+```{r}
+library(broom)
+library(dplyr)
+library(knitr)
+
+core_tbl <- tidy(logit_core, conf.int = TRUE, exponentiate = TRUE) %>%
+  mutate(
+    OR = round(estimate, 2),
+    CI_low = round(conf.low, 2),
+    CI_high = round(conf.high, 2),
+    OR_CI = paste0(OR, " (", CI_low, ", ", CI_high, ")"),
+    p_value = ifelse(p.value < 0.001, "<0.001", sprintf("%.3f", p.value))
+  ) %>%
+  mutate(
+    term = recode(term,
+      "(Intercept)" = "Intercept",
+      "bmi_c" = "BMI (per 1-unit increase)",
+      "sexMale" = "Male (vs Female)",
+      "high_bpYes" = "High blood pressure (Yes vs No)",
+
+      # Age categories
+      "age_cat25-29" = "Age 25–29 (vs 18–24)",
+      "age_cat30-34" = "Age 30–34",
+      "age_cat35-39" = "Age 35–39",
+      "age_cat40-44" = "Age 40–44",
+      "age_cat45-49" = "Age 45–49",
+      "age_cat50-54" = "Age 50–54",
+      "age_cat55-59" = "Age 55–59",
+      "age_cat60-64" = "Age 60–64",
+      "age_cat65-69" = "Age 65–69",
+      "age_cat70-74" = "Age 70–74",
+      "age_cat75-79" = "Age 75–79",
+      "age_cat80+"   = "Age 80+",
+
+      # General health
+      "gen_hlth_catVery Good" = "Very good health (vs Excellent)",
+      "gen_hlth_catGood"      = "Good health",
+      "gen_hlth_catFair"      = "Fair health",
+      "gen_hlth_catPoor"      = "Poor health"
+    )
+  ) %>%
+  select(
+    Predictor = term,
+    OR,
+    `95% CI` = OR_CI,
+    p_value
+  )
+
+kable(
+  core_tbl,
+  caption = "Final Multivariable Logistic Regression Model for Diabetes (JAMA/NEJM Style)",
+  col.names = c("Predictor", "Adjusted OR", "95% CI", "P Value"),
+  align = "lccc"
+)
+```
+To investigate the determinants of diabetes in this population, we fitted a series of logistic regression models designed to evaluate main effects, potential effect modification, nonlinear associations, and cumulative health burden. Logistic regression is well suited for this analysis because the outcome—presence of diabetes—is binary, and the large sample size allows stable estimation of adjusted odds ratios across multiple predictors. Each model was selected to answer a specific analytic question and to refine our understanding of how demographic, behavioral, and clinical variables influence diabetes risk.
+
+The main-effects model served as the primary analytic framework and included BMI, age, sex, general health, high blood pressure, high cholesterol, smoking, physical activity, and socioeconomic factors. This model identified the strongest independent predictors of diabetes. Higher BMI, poorer self-rated general health, and hypertension were among the most influential variables; each 1-unit increase in BMI raised the odds of diabetes by approximately 6%, high blood pressure more than doubled the odds, and poor general health increased the odds more than six-fold. Men also demonstrated higher risk compared with women. This model establishes the baseline pattern of adjusted associations and forms the foundation for all subsequent analyses.
+
+To assess effect modification by age, we fitted a BMI × age category interaction model. Age may alter the metabolic consequences of adiposity, and interaction terms allow the BMI slope to vary across age groups. The model showed that BMI remained a significant predictor at all ages, but its effect was stronger among older adults, suggesting heightened metabolic susceptibility later in life. This model clarifies that the BMI–diabetes relationship is not uniform across age categories.
+
+A more complex three-way interaction model examined whether the relationship between BMI and diabetes differed jointly by physical activity and high blood pressure. This analysis tested whether behavioral and clinical factors interact multiplicatively to modify risk. Although BMI and hypertension remained strong predictors, the interaction terms were not statistically significant, indicating that these risk factors operate largely independently. This model helps rule out synergistic modification and reinforces conclusions from the main-effects model.
+Recognizing that the association between BMI and diabetes may be nonlinear, we fitted a restricted cubic spline model to allow the BMI–risk curve to vary flexibly without imposing a linear structure. The spline analysis revealed a slowly increasing risk at lower BMI levels and a sharp escalation in risk across the overweight and obese ranges. This model demonstrates that diabetes risk accelerates nonlinearly with increasing adiposity and provides a more nuanced understanding of the BMI–risk relationship.
+
+To examine potential sex differences, we fitted a BMI × sex interaction model. Physiologic and hormonal differences could plausibly modify BMI’s effect; however, the interaction term was small and not clinically meaningful. BMI had a similar effect in both sexes, although male sex remained an independent predictor of higher risk. This model shows that sex differences in diabetes risk arise from baseline differences rather than differential BMI effects.
+
+We further explored social determinants by fitting an income × general health interaction model. Although both lower income and poorer general health independently increased diabetes risk, the interaction terms were not statistically significant, indicating that income does not materially alter the strength of the association between health status and diabetes. This model suggests that socioeconomic and health-status gradients contribute additively to risk.
+
+Because psychological stress and activity levels may jointly influence metabolic outcomes, we examined a mental health × physical activity model. While poor mental health and inactivity were each associated with higher diabetes risk, their interaction was not significant, suggesting that physical activity does not strongly modify the mental-health–diabetes relationship. This model highlights the independent, rather than interactive, roles of psychosocial and behavioral factors.
+
+To capture overall chronic disease burden, we constructed a multi-morbidity model using a composite health risk score. This model demonstrated a strong dose–response pattern: each additional comorbidity substantially increased diabetes risk. The model confirms that cumulative health burden is a powerful predictor and provides an efficient summary of cardiometabolic vulnerability.
+Then, we conducted age-stratified logistic regressions to compare predictors across younger and older adults. Stratification allowed us to estimate separate models without relying on interaction terms. BMI and high blood pressure were significant predictors in both strata, but their effects were stronger among older adults. Poor self-rated health remained a robust predictor across age groups. These models reinforce earlier findings and highlight age-specific differences in vulnerability.
+
+
+In the final multivariable model, several predictors demonstrated strong and independent associations with diabetes. Higher BMI was associated with increased risk, with each 1-unit increase corresponding to a 6% higher odds of diabetes (adjusted OR 1.06, 95% CI 1.06–1.06). Age showed a pronounced nonlinear pattern: the dominant linear contrast was strongly positive (OR 16.10, 95% CI 13.96–18.69), while higher-order contrasts were less than 1, reflecting curvature in the age–risk relationship. High blood pressure was among the strongest clinical predictors, associated with more than double the odds of diabetes (OR 2.30, 95% CI 2.23–2.37). Self-reported general health also showed a large gradient, with the primary contrast indicating a more than six-fold increase in diabetes risk for those reporting worse health (OR 6.27, 95% CI 5.94–6.61). Male sex was associated with moderately elevated odds (OR 1.26, 95% CI 1.22–1.29). Together, these findings highlight the dominant role of adiposity, age-related risk, blood pressure, and overall perceived health status in determining diabetes risk.
+
+
 # Predictive model evaluation
 
 

@@ -4,23 +4,23 @@ high_bp,Factor,High blood pressure,"No, Yes"
 high_chol,Factor,High cholesterol,"No, Yes"
 chol_check,Factor,Cholesterol check in past 5 years,"No, Yes"
 bmi,Numeric,Body Mass Index,Continuous
-smoker,Factor,Smoked at least 100 cigarettes in life,"No, Yes"
+smoker,Factor,Smoked 100+ cigarettes in life,"No, Yes"
 stroke,Factor,History of stroke,"No, Yes"
 heart_disease_or_attack,Factor,Coronary heart disease or MI,"No, Yes"
 phys_activity,Factor,Physical activity in past 30 days,"No, Yes"
-fruits,Factor,Consume fruit 1+ times per day,"No, Yes"
-veggies,Factor,Consume vegetables 1+ times per day,"No, Yes"
-hvy_alcohol_consump,Factor,Heavy alcohol consumption,"No, Yes"
-any_healthcare,Factor,Have any healthcare coverage,"No, Yes"
-no_docbc_cost,Factor,Could not see doctor due to cost,"No, Yes"
-gen_hlth,Numeric,General health rating,"1-5 (1=excellent, 5=poor)"
-ment_hlth,Numeric,Days of poor mental health (past 30),0-30
-phys_hlth,Numeric,Days of poor physical health (past 30),0-30
-diff_walk,Factor,Difficulty walking or climbing stairs,"No, Yes"
+fruits,Factor,Consume fruit daily,"No, Yes"
+veggies,Factor,Consume vegetables daily,"No, Yes"
+hvy_alcohol_consump,Factor,Heavy alcohol use,"No, Yes"
+any_healthcare,Factor,Have healthcare coverage,"No, Yes"
+no_docbc_cost,Factor,Avoided doctor due to cost,"No, Yes"
+gen_hlth,Numeric,General health rating,1–5
+ment_hlth,Numeric,Poor mental health days,0–30
+phys_hlth,Numeric,Poor physical health days,0–30
+diff_walk,Factor,Difficulty walking,"No, Yes"
 sex,Factor,Biological sex,"Female, Male"
-age,Numeric,Age category,1-13 (see age_cat for labels)
-education,Numeric,Education level,1-6
-income,Numeric,Income level,1-8
-bmi_category,Factor,BMI category,"Underweight, Normal, Overweight, Obese"
-health_risk_score,Numeric,Composite health risk score,Continuous (0-7)
-lifestyle_score,Numeric,Healthy lifestyle score,0-3
+age,Numeric,Age category,1–13
+education,Numeric,Education level,1–6
+income,Numeric,Income level,1–8
+bmi_category,Factor,BMI category,Underweight–Obese
+health_risk_score,Numeric,Composite health risk score,0–7
+lifestyle_score,Numeric,Healthy lifestyle score,0–3
