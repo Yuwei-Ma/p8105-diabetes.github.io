@@ -1,0 +1,104 @@
+---
+title: "NY NOAA Weather Dashboard"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(tidyverse)
+library(plotly)
+library(p8105.datasets)
+library(dplyr)
+library(lubridate)
+library(ggplot2)
+```
+
+
+```{r}
+data("ny_noaa")
+
+noaa_clean <- ny_noaa |> 
+  filter(!is.na(tmax), !is.na(prcp),
+         id == "USW00094728") |> 
+  mutate(
+    year = year(date),
+    month = month(date, label = TRUE)
+  ) |> 
+  filter(
+         year >= 2005) |> 
+  select(date, prcp, tmax, tmin, year, month)
+```
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Chart A
+
+```{r}
+noaa_clean |> 
+  mutate(
+    label = str_c("Precipitation: ", prcp) 
+  ) |> 
+  plot_ly(
+  x = ~tmax, y = ~prcp, color = ~month,
+  text = ~ label,
+  type = "scatter", mode = "markers",
+  marker = list(size = 6, opacity = 0.6)
+  ) |> 
+  layout(
+  title = "Daily Maximum Temperature vs Precipitation (Central Park, 2005+)",
+  xaxis = list(title = "Max Temperature (tenths °C)"),
+  yaxis = list(title = "Precipitation (tenths mm)")
+  )
+
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Chart B
+
+```{r}
+monthly_prcp <- noaa_clean |> 
+  group_by(month) |> 
+  summarize(avg_prcp = mean(prcp, na.rm = TRUE)) %>%
+  mutate(
+    bar_label = str_c("Month: ", month,
+                      "<br>Avg. Precip: ", round(avg_prcp, 2), " mm")
+  )
+
+plot_ly(
+  data = monthly_prcp,
+  x = ~month, y = ~avg_prcp,
+  text = ~bar_label, color = ~month,
+  hoverinfo = "text",
+  type = "bar"
+) |> 
+  layout(
+    title = "Average Monthly Precipitation (Central Park, 2005+)",
+    xaxis = list(title = "Month"),
+    yaxis = list(title = "Average Precipitation (mm)")
+  )
+```
+
+
+### Chart C
+
+```{r}
+plot_ly(
+  data = noaa_clean,
+  x = ~month, y = ~tmax,
+  color = ~month, type = "box"
+) |> 
+  layout(
+    title = "Monthly Distribution of Max Temp (Central Park, 2005+)",
+    xaxis = list(title = "Month"),
+    yaxis = list(title = "Maximum Temperature (°C)"),
+    showlegend = FALSE 
+  )
+
+```
+

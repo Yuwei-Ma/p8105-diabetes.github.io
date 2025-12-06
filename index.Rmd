@@ -1,0 +1,22 @@
+---
+title: "Yuwei's website"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+Hi, I'm **Yuwei** 👋  
+Welcome to my personal website! I'm a **biostatistics student** interested in **data science**.
+
+
+- 🏠 This is the [home page](index.html).  
+- 🎓 Check out my [academic and professional experience](experience.html).  
+- 📊 Here's the [dashboard](flexdashboard.html) for NOAA dataset  
+- ℹ️ Learn more [about this site](about.html).
+
+---
+
+Here's a picture of Granny (I don't have either a cat or dog so I borrowed my friends Niki's dog Granny):
+
+![](image/granny.jpg){width=50%}
