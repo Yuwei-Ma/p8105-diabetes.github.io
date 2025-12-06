@@ -2,7 +2,7 @@
 title: "Final Project"
 author: "Yuwei Ma, Rachel Lu, Chenxi Liu, Xiuhong Fan, Daisy Gui"
 date: "December 2025"
-output: github_document
+output: html_document
 ---
 
 
