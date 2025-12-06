@@ -6,6 +6,457 @@ output: github_document
 ---
 
 
+# P8105 Final Project: Diabetes Health Indicators
+
+**Task 1: Data Cleaning, Variable Processing, and Train/Test Dataset Creation**
+
+Dataset: CDC BRFSS 2015 Diabetes Health Indicators  
+Source: https://www.kaggle.com/datasets/alexteboul/diabetes-health-indicators-dataset
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+## Load Required Libraries
+
+```{r load_libraries}
+library(tidyverse)
+library(caret)
+library(skimr)
+library(janitor)
+library(corrplot)
+library(DataExplorer)
+library(knitr)
+
+# Set seed for reproducibility
+set.seed(123)
+```
+
+## 1. Data Import
+
+The dataset has three versions:
+- `diabetes_012_health_indicators_BRFSS2015.csv` (3 classes: 0, 1, 2)
+- `diabetes_binary_5050split_health_indicators_BRFSS2015.csv` (balanced binary)
+- `diabetes_binary_health_indicators_BRFSS2015.csv` (full binary)
+
+For this project, we'll use the full binary version for more data.
+
+```{r import_data}
+diabetes_raw <- read_csv("diabetes_binary_health_indicators_BRFSS2015.csv")
+
+glimpse(diabetes_raw)
+```
+
+## 2. Initial Data Exploration
+
+```{r explore_data}
+# Check for missing values
+colSums(is.na(diabetes_raw))
+
+# Summary statistics
+summary(diabetes_raw)
+
+# Check for duplicates
+sum(duplicated(diabetes_raw))
+
+# Examine outcome variable distribution
+table(diabetes_raw$Diabetes_binary)
+prop.table(table(diabetes_raw$Diabetes_binary))
+```
+
+## 3. Data Cleaning
+
+```{r clean_data}
+diabetes_clean <- diabetes_raw %>%
+  # Clean column names
+  clean_names() %>%
+  
+  # Fix the heart disease variable name
+  rename(heart_disease_or_attack = heart_diseaseor_attack) %>%
+  
+  # Remove duplicates if any
+  distinct() %>%
+  
+  # Remove rows with missing values (if any)
+  drop_na()
+
+glimpse(diabetes_clean)
+```
+
+## 4. Variable Processing and Feature Engineering
+
+### Variable Descriptions
+
+According to the dataset documentation:
+
+1. **Diabetes_binary**: 0 = no diabetes, 1 = prediabetes or diabetes
+2. **HighBP**: 0 = no, 1 = yes
+3. **HighChol**: 0 = no, 1 = yes
+4. **CholCheck**: 0 = no, 1 = yes (cholesterol check in 5 years)
+5. **BMI**: Body Mass Index
+6. **Smoker**: 0 = no, 1 = yes
+7. **Stroke**: 0 = no, 1 = yes
+8. **HeartDiseaseorAttack**: 0 = no, 1 = yes
+9. **PhysActivity**: 0 = no, 1 = yes
+10. **Fruits**: 0 = no, 1 = yes (consume fruit 1+ times per day)
+11. **Veggies**: 0 = no, 1 = yes (consume vegetables 1+ times per day)
+12. **HvyAlcoholConsump**: 0 = no, 1 = yes
+13. **AnyHealthcare**: 0 = no, 1 = yes
+14. **NoDocbcCost**: 0 = no, 1 = yes (couldn't see doctor due to cost)
+15. **GenHlth**: 1-5 scale (1 = excellent, 5 = poor)
+16. **MentHlth**: days of poor mental health in past 30 days (0-30)
+17. **PhysHlth**: days of poor physical health in past 30 days (0-30)
+18. **DiffWalk**: 0 = no, 1 = yes (difficulty walking or climbing stairs)
+19. **Sex**: 0 = female, 1 = male
+20. **Age**: 1-13 (age categories)
+21. **Education**: 1-6 (education level)
+22. **Income**: 1-8 (income categories)
+
+### Processing
+
+```{r process_variables}
+diabetes_processed <- diabetes_clean %>%
+  mutate(
+    # Convert outcome to factor
+    diabetes_binary = factor(diabetes_binary, 
+                             levels = c(0, 1),
+                             labels = c("No_Diabetes", "Diabetes")),
+    
+    # Convert binary variables to factors
+    high_bp = factor(high_bp, levels = c(0, 1), labels = c("No", "Yes")),
+    high_chol = factor(high_chol, levels = c(0, 1), labels = c("No", "Yes")),
+    chol_check = factor(chol_check, levels = c(0, 1), labels = c("No", "Yes")),
+    smoker = factor(smoker, levels = c(0, 1), labels = c("No", "Yes")),
+    stroke = factor(stroke, levels = c(0, 1), labels = c("No", "Yes")),
+    heart_disease_or_attack = factor(heart_disease_or_attack, 
+                                     levels = c(0, 1), 
+                                     labels = c("No", "Yes")),
+    phys_activity = factor(phys_activity, levels = c(0, 1), labels = c("No", "Yes")),
+    fruits = factor(fruits, levels = c(0, 1), labels = c("No", "Yes")),
+    veggies = factor(veggies, levels = c(0, 1), labels = c("No", "Yes")),
+    hvy_alcohol_consump = factor(hvy_alcohol_consump, 
+                                 levels = c(0, 1), 
+                                 labels = c("No", "Yes")),
+    any_healthcare = factor(any_healthcare, levels = c(0, 1), labels = c("No", "Yes")),
+    no_docbc_cost = factor(no_docbc_cost, levels = c(0, 1), labels = c("No", "Yes")),
+    diff_walk = factor(diff_walk, levels = c(0, 1), labels = c("No", "Yes")),
+    sex = factor(sex, levels = c(0, 1), labels = c("Female", "Male")),
+    
+    # Convert ordinal variables to factors
+    gen_hlth_cat = factor(gen_hlth, 
+                          levels = 1:5,
+                          labels = c("Excellent", "Very Good", "Good", "Fair", "Poor"),
+                          ordered = TRUE),
+    
+    # Create age groups
+    age_cat = factor(age,
+                     levels = 1:13,
+                     labels = c("18-24", "25-29", "30-34", "35-39", "40-44",
+                                "45-49", "50-54", "55-59", "60-64", "65-69",
+                                "70-74", "75-79", "80+"),
+                     ordered = TRUE),
+    
+    # Create education categories
+    education_cat = factor(education,
+                           levels = 1:6,
+                           labels = c("Never/K-8", "Grades 9-11", "Grade 12/GED",
+                                      "College 1-3 yrs", "College 4+ yrs", "Unknown"),
+                           ordered = TRUE),
+    
+    # Create income categories
+    income_cat = factor(income,
+                        levels = 1:8,
+                        labels = c("<$10k", "$10k-$15k", "$15k-$20k", "$20k-$25k",
+                                   "$25k-$35k", "$35k-$50k", "$50k-$75k", "$75k+"),
+                        ordered = TRUE),
+    
+    # Create BMI categories
+    bmi_category = case_when(
+      bmi < 18.5 ~ "Underweight",
+      bmi >= 18.5 & bmi < 25 ~ "Normal",
+      bmi >= 25 & bmi < 30 ~ "Overweight",
+      bmi >= 30 ~ "Obese"
+    ) %>% factor(levels = c("Underweight", "Normal", "Overweight", "Obese"),
+                 ordered = TRUE),
+    
+    # Create mental health categories
+    ment_hlth_cat = case_when(
+      ment_hlth == 0 ~ "None",
+      ment_hlth <= 7 ~ "1-7 days",
+      ment_hlth <= 14 ~ "8-14 days",
+      ment_hlth <= 30 ~ "15-30 days"
+    ) %>% factor(levels = c("None", "1-7 days", "8-14 days", "15-30 days"),
+                 ordered = TRUE),
+    
+    # Create physical health categories
+    phys_hlth_cat = case_when(
+      phys_hlth == 0 ~ "None",
+      phys_hlth <= 7 ~ "1-7 days",
+      phys_hlth <= 14 ~ "8-14 days",
+      phys_hlth <= 30 ~ "15-30 days"
+    ) %>% factor(levels = c("None", "1-7 days", "8-14 days", "15-30 days"),
+                 ordered = TRUE),
+    
+    # Create composite health score
+    health_risk_score = as.numeric(high_bp == "Yes") +
+      as.numeric(high_chol == "Yes") +
+      as.numeric(stroke == "Yes") +
+      as.numeric(heart_disease_or_attack == "Yes") +
+      as.numeric(smoker == "Yes") +
+      as.numeric(hvy_alcohol_consump == "Yes") +
+      (gen_hlth - 1) / 4,
+    
+    # Create healthy lifestyle score
+    lifestyle_score = as.numeric(phys_activity == "Yes") +
+      as.numeric(fruits == "Yes") +
+      as.numeric(veggies == "Yes")
+  )
+
+glimpse(diabetes_processed)
+```
+
+## 5. Data Quality Checks
+
+```{r quality_checks}
+# Check for any issues in processed data
+sum(is.na(diabetes_processed))
+
+# Verify factor levels
+table(diabetes_processed$diabetes_binary)
+
+# Check continuous variables for outliers
+diabetes_processed %>%
+  select(bmi, ment_hlth, phys_hlth, health_risk_score, lifestyle_score) %>%
+  summary()
+```
+
+## 6. Train/Test Split
+
+Create stratified train/test split (80/20) using stratified sampling to maintain outcome distribution.
+
+```{r train_test_split}
+# Set seed again for reproducibility
+set.seed(123)
+
+# Create partition index
+train_index <- createDataPartition(
+  diabetes_processed$diabetes_binary,
+  p = 0.80,
+  list = FALSE,
+  times = 1
+)
+
+# Create training and testing datasets
+diabetes_train <- diabetes_processed[train_index, ]
+diabetes_test <- diabetes_processed[-train_index, ]
+
+# Verify split proportions
+nrow(diabetes_train)
+nrow(diabetes_test)
+
+# Check outcome distribution in train and test sets
+prop.table(table(diabetes_train$diabetes_binary))
+prop.table(table(diabetes_test$diabetes_binary))
+```
+
+## 7. Export Cleaned Datasets
+
+```{r export_data}
+# Create output directory if it doesn't exist
+if (!dir.exists("data")) {
+  dir.create("data")
+}
+
+# Save processed datasets
+write_csv(diabetes_processed, "data/diabetes_processed.csv")
+write_csv(diabetes_train, "data/diabetes_train.csv")
+write_csv(diabetes_test, "data/diabetes_test.csv")
+
+# Also save as RDS for faster loading in R
+saveRDS(diabetes_processed, "data/diabetes_processed.rds")
+saveRDS(diabetes_train, "data/diabetes_train.rds")
+saveRDS(diabetes_test, "data/diabetes_test.rds")
+```
+
+## 8. Data Dictionary and Variable Summary
+```{r data_dictionary}
+# Create and save data dictionary
+data_dictionary <- tribble(
+  ~Variable, ~Type, ~Description, ~Values,
+  "diabetes_binary", "Factor", "Diabetes diagnosis", "No_Diabetes, Diabetes",
+  "high_bp", "Factor", "High blood pressure", "No, Yes",
+  "high_chol", "Factor", "High cholesterol", "No, Yes",
+  "chol_check", "Factor", "Cholesterol check in past 5 years", "No, Yes",
+  "bmi", "Numeric", "Body Mass Index", "Continuous",
+  "smoker", "Factor", "Smoked at least 100 cigarettes in life", "No, Yes",
+  "stroke", "Factor", "History of stroke", "No, Yes",
+  "heart_disease_or_attack", "Factor", "Coronary heart disease or MI", "No, Yes",
+  "phys_activity", "Factor", "Physical activity in past 30 days", "No, Yes",
+  "fruits", "Factor", "Consume fruit 1+ times per day", "No, Yes",
+  "veggies", "Factor", "Consume vegetables 1+ times per day", "No, Yes",
+  "hvy_alcohol_consump", "Factor", "Heavy alcohol consumption", "No, Yes",
+  "any_healthcare", "Factor", "Have any healthcare coverage", "No, Yes",
+  "no_docbc_cost", "Factor", "Could not see doctor due to cost", "No, Yes",
+  "gen_hlth", "Numeric", "General health rating", "1-5 (1=excellent, 5=poor)",
+  "ment_hlth", "Numeric", "Days of poor mental health (past 30)", "0-30",
+  "phys_hlth", "Numeric", "Days of poor physical health (past 30)", "0-30",
+  "diff_walk", "Factor", "Difficulty walking or climbing stairs", "No, Yes",
+  "sex", "Factor", "Biological sex", "Female, Male",
+  "age", "Numeric", "Age category", "1-13 (see age_cat for labels)",
+  "education", "Numeric", "Education level", "1-6",
+  "income", "Numeric", "Income level", "1-8",
+  "bmi_category", "Factor", "BMI category", "Underweight, Normal, Overweight, Obese",
+  "health_risk_score", "Numeric", "Composite health risk score", "Continuous (0-7)",
+  "lifestyle_score", "Numeric", "Healthy lifestyle score", "0-3"
+)
+
+write_csv(data_dictionary, "data/data_dictionary.csv")
+```
+
+```{r variable-summary-table}
+# Create comprehensive variable summary table organized by category
+variables_summary <- tibble(
+  Category = c(
+    "Outcome",
+    "Health Conditions", "Health Conditions", "Health Conditions", "Health Conditions", "Health Conditions",
+    "Physical Metrics", "Physical Metrics", "Physical Metrics",
+    "Lifestyle", "Lifestyle", "Lifestyle", "Lifestyle", "Lifestyle",
+    "Health Status", "Health Status", "Health Status", "Health Status", "Health Status",
+    "Healthcare Access", "Healthcare Access",
+    "Demographics", "Demographics", "Demographics", "Demographics", "Demographics", "Demographics", "Demographics",
+    "Engineered Features", "Engineered Features"
+  ),
+  Variable = c(
+    "diabetes_binary",
+    "high_bp", "high_chol", "stroke", "heart_disease_or_attack", "chol_check",
+    "bmi", "bmi_category", "diff_walk",
+    "smoker", "phys_activity", "fruits", "veggies", "hvy_alcohol_consump",
+    "gen_hlth", "ment_hlth", "phys_hlth", "ment_hlth_cat", "phys_hlth_cat",
+    "any_healthcare", "no_docbc_cost",
+    "age", "age_cat", "sex", "education", "education_cat", "income", "income_cat",
+    "health_risk_score", "lifestyle_score"
+  ),
+  Description = c(
+    "No_Diabetes, Diabetes",
+    "High blood pressure (No, Yes)", "High cholesterol (No, Yes)", "History of stroke (No, Yes)", 
+    "History of heart disease or attack (No, Yes)", "Cholesterol check in past 5 years (No, Yes)",
+    "Body Mass Index (continuous)", "Underweight, Normal, Overweight, Obese", "Difficulty walking/climbing stairs (No, Yes)",
+    "Smoked 100+ cigarettes lifetime (No, Yes)", "Physical activity past 30 days (No, Yes)", 
+    "Consume fruit 1+ times/day (No, Yes)", "Consume vegetables 1+ times/day (No, Yes)", "Heavy alcohol consumption (No, Yes)",
+    "General health (1-5: Excellent to Poor)", "Days poor mental health past 30 days (0-30)", 
+    "Days poor physical health past 30 days (0-30)", "Mental health categories (None, 1-7, 8-14, 15-30 days)", 
+    "Physical health categories (None, 1-7, 8-14, 15-30 days)",
+    "Has healthcare coverage (No, Yes)", "Could not see doctor due to cost (No, Yes)",
+    "Age category (1-13)", "Age groups (18-24, 25-29, ..., 80+)", "Biological sex (Female, Male)", 
+    "Education level (1-6)", "Education categories", "Income level (1-8)", "Income categories (<$10k, ..., $75k+)",
+    "Composite health risk score (0-7)", "Healthy lifestyle score (0-3)"
+  )
+)
+
+kable(variables_summary, caption = "Dataset Variables by Category")
+```
+
+## Report Writing
+
+**1. Motivation**
+
+Diabetes is one of the most prevalent chronic diseases in the United States, affecting 38.4 million Americans (11.6% of the U.S. population) as of 2021 (CDC, 2024). The estimated total cost of diagnosed diabetes reached 412.9 billion dollars in 2022, including 306.6 billion dollars in direct medical costs and 106.3 billion dollars in indirect costs (Parker et al., 2024). A significant challenge in diabetes management is underdiagnosis—approximately 1 in 5 adults with diabetes and more than 8 in 10 adults with prediabetes are unaware of their condition (CDC, 2024). This project aims to identify key behavioral, demographic, and clinical factors associated with diabetes risk and build predictive models to support early detection and intervention.
+
+**2. Related Work**
+
+This project is inspired by the CDC's ongoing efforts to combat the diabetes epidemic and previous research demonstrating the value of behavioral risk factor data for disease prediction. Recent work by [Li et al. (2024)] (https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0311222) used the BRFSS dataset to develop a diabetes prediction model using advanced ensemble learning methods, combining GA-XGBoost with Stacking techniques and achieving high predictive accuracy. Their work demonstrated the effectiveness of addressing class imbalance through sampling methods like SMOTEENN and using SHAP for model interpretation. The logistic regression and predictive modeling techniques covered in P8105 provided the foundation for our analytical approach, particularly the lectures on binary outcomes, model evaluation using ROC curves, and the importance of reproducible research.
+
+**4. Data**
+
+4.1 Data Source
+
+Our data source is from [Kaggle] (https://www.kaggle.com/datasets/alexteboul/diabetes-health-indicators-dataset). This dataset covers detailed health information on 253,680 survey respondents from the CDC's Behavioral Risk Factor Surveillance System (BRFSS) 2015. It includes a wide range of attributes such as health conditions, lifestyle behaviors, demographic information, and healthcare access. The data was collected through telephone surveys conducted across the United States. The original dataset is called diabetes_binary_health_indicators_BRFSS2015.csv.
+
+
+4.2. Data Cleaning Process
+
+The BRFSS dataset was already well-maintained with minimal data quality issues. However, we conducted several processing steps to make the data more readable and analyzable:
+
+•      Variable name standardization: Converted all variable names to snake_case format for consistency (e.g., HeartDiseaseorAttack → heart_disease_or_attack);
+
+•       Data quality checks: Verified that there were no missing values or duplicate observations in the dataset;
+
+•       Factor conversion: Converted all binary variables (0/1) to factors with meaningful labels (e.g., "No"/"Yes" for health conditions, "Female"/"Male" for sex, "No_Diabetes"/"Diabetes" for the outcome variable) according to [dataset notebook] (https://www.kaggle.com/code/alexteboul/diabetes-health-indicators-dataset-notebook) and [codebook] (https://www.cdc.gov/brfss/annual_data/2015/pdf/codebook15_llcp.pdf);
+
+•       Ordered factor creation: Created ordered factors for variables with natural ordering (general health from Excellent to Poor, age groups from 18-24 to 80+, education and income levels);
+
+•       Feature engineering: Created interpretable new variables according to [dataset notebook] (https://www.kaggle.com/code/alexteboul/diabetes-health-indicators-dataset-notebook) and [codebook] (https://www.cdc.gov/brfss/annual_data/2015/pdf/codebook15_llcp.pdf):
+
+  - BMI Categories: Classified BMI into standard categories (Underweight, Normal, Overweight, Obese);
+
+  - Mental Health Categories: Grouped days of poor mental health (None, 1-7 days, 8-14 days, 15-30 days);
+
+  - Physical Health Categories: Grouped days of poor physical health using the same categorization;
+
+  - Health Risk Score: Created a composite score (0-7) summing major health conditions plus normalized general health rating;
+
+  - Lifestyle Score: Calculated a score (0-3) based on physical activity, fruit consumption, and vegetable consumption.
+
+
+4.3. Train-Test Split
+
+To ensure robust model evaluation, we split the data into training and testing sets:
+
+•       Training set: 202,944 observations (80%) - used for exploratory analysis and model development;
+
+•       Testing set: 50,736 observations (20%) - reserved exclusively for final model evaluation;
+
+•       Stratification method: Used stratified random sampling to maintain the outcome distribution (13.5% diabetes prevalence) in both sets;
+
+•       Reproducibility: Set random seed to 123 to ensure consistent splits across all analyses.
+
+4.4. Cleaned Dataset
+
+The cleaned dataset is tidy, readable, and analyzable. It includes the following variables:
+Outcome Variable:
+ * diabetes_binary: Whether the individual has diabetes or prediabetes (No_Diabetes, Diabetes).
+ * Health Conditions:
+ * high_bp: High blood pressure diagnosis (No, Yes).
+ * high_chol: High cholesterol diagnosis (No, Yes).
+ * stroke: History of stroke (No, Yes).
+ * heart_disease_or_attack: History of coronary heart disease or heart attack (No, Yes).
+ * chol_check: Had cholesterol check in past 5 years (No, Yes).
+
+Physical Metrics:
+ * bmi: Body Mass Index (continuous numeric).
+ * bmi_category: BMI classification (Underweight, Normal, Overweight, Obese).
+ * diff_walk: Difficulty walking or climbing stairs (No, Yes).
+ 
+Lifestyle Behaviors:
+ * smoker: Smoked at least 100 cigarettes in lifetime (No, Yes).
+ * phys_activity: Physical activity in past 30 days (No, Yes).
+ * fruits: Consume fruit 1+ times per day (No, Yes).
+ * veggies: Consume vegetables 1+ times per day (No, Yes).
+hvy_alcohol_consump: Heavy alcohol consumption (No, Yes).
+Health Status:
+ * gen_hlth: General health rating (1-5: Excellent to Poor).
+ * ment_hlth: Days of poor mental health in past 30 days (0-30).
+ * phys_hlth: Days of poor physical health in past 30 days (0-30).
+ * ment_hlth_cat: Mental health categories (None, 1-7 days, 8-14 days, 15-30 days).
+ * phys_hlth_cat: Physical health categories (None, 1-7 days, 8-14 days, 15-30 days).
+ 
+Healthcare Access:
+ * any_healthcare: Have any healthcare coverage (No, Yes).
+ * no_docbc_cost: Could not see doctor due to cost (No, Yes).
+
+Demographics:
+ * age: Age category (1-13).
+ * age_cat: Age groups with labels (18-24, 25-29, ..., 80+).
+ * sex: Biological sex (Female, Male).
+ * education: Education level (1-6).
+ * education_cat: Education categories (Never/K-8, Grades 9-11, Grade 12/GED, College 1-3 yrs, College 4+ yrs, Unknown).
+ * income: Income level (1-8).
+ * income_cat: Income categories (<$10k, $10k-$15k, ..., $75k+).
+
+Engineered Features:
+ * health_risk_score: Composite health risk score (0-7, higher  indicates more risk factors).
+ * lifestyle_score: Healthy lifestyle score (0-3, higher indicates healthier behaviors).
+ 
 
 ## Exploratory analysis
 
