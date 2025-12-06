@@ -27,7 +27,7 @@ library(janitor)
 library(corrplot)
 library(DataExplorer)
 library(knitr)
-
+library(pROC)
 # Set seed for reproducibility
 set.seed(123)
 ```

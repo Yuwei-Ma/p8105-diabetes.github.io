@@ -598,6 +598,157 @@ kable(variables_summary, caption = "Dataset Variables by Category")
 
 Dataset Variables by Category
 
+## Report Writing
+
+**1. Motivation**
+
+Diabetes is one of the most prevalent chronic diseases in the United
+States, affecting 38.4 million Americans (11.6% of the U.S. population)
+as of 2021 (CDC, 2024). The estimated total cost of diagnosed diabetes
+reached 412.9 billion dollars in 2022, including 306.6 billion dollars
+in direct medical costs and 106.3 billion dollars in indirect costs
+(Parker et al., 2024). A significant challenge in diabetes management is
+underdiagnosis—approximately 1 in 5 adults with diabetes and more than 8
+in 10 adults with prediabetes are unaware of their condition (CDC,
+2024). This project aims to identify key behavioral, demographic, and
+clinical factors associated with diabetes risk and build predictive
+models to support early detection and intervention.
+
+**2. Related Work**
+
+This project is inspired by the CDC’s ongoing efforts to combat the
+diabetes epidemic and previous research demonstrating the value of
+behavioral risk factor data for disease prediction. Recent work by \[Li
+et al. (2024)\]
+(<https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0311222>)
+used the BRFSS dataset to develop a diabetes prediction model using
+advanced ensemble learning methods, combining GA-XGBoost with Stacking
+techniques and achieving high predictive accuracy. Their work
+demonstrated the effectiveness of addressing class imbalance through
+sampling methods like SMOTEENN and using SHAP for model interpretation.
+The logistic regression and predictive modeling techniques covered in
+P8105 provided the foundation for our analytical approach, particularly
+the lectures on binary outcomes, model evaluation using ROC curves, and
+the importance of reproducible research.
+
+**4. Data**
+
+4.1 Data Source
+
+Our data source is from \[Kaggle\]
+(<https://www.kaggle.com/datasets/alexteboul/diabetes-health-indicators-dataset>).
+This dataset covers detailed health information on 253,680 survey
+respondents from the CDC’s Behavioral Risk Factor Surveillance System
+(BRFSS) 2015. It includes a wide range of attributes such as health
+conditions, lifestyle behaviors, demographic information, and healthcare
+access. The data was collected through telephone surveys conducted
+across the United States. The original dataset is called
+diabetes_binary_health_indicators_BRFSS2015.csv.
+
+4.2. Data Cleaning Process
+
+The BRFSS dataset was already well-maintained with minimal data quality
+issues. However, we conducted several processing steps to make the data
+more readable and analyzable:
+
+• Variable name standardization: Converted all variable names to
+snake_case format for consistency (e.g., HeartDiseaseorAttack →
+heart_disease_or_attack);
+
+• Data quality checks: Verified that there were no missing values or
+duplicate observations in the dataset;
+
+• Factor conversion: Converted all binary variables (0/1) to factors
+with meaningful labels (e.g., “No”/“Yes” for health conditions,
+“Female”/“Male” for sex, “No_Diabetes”/“Diabetes” for the outcome
+variable) according to \[dataset notebook\]
+(<https://www.kaggle.com/code/alexteboul/diabetes-health-indicators-dataset-notebook>)
+and \[codebook\]
+(<https://www.cdc.gov/brfss/annual_data/2015/pdf/codebook15_llcp.pdf>);
+
+• Ordered factor creation: Created ordered factors for variables with
+natural ordering (general health from Excellent to Poor, age groups from
+18-24 to 80+, education and income levels);
+
+• Feature engineering: Created interpretable new variables according to
+\[dataset notebook\]
+(<https://www.kaggle.com/code/alexteboul/diabetes-health-indicators-dataset-notebook>)
+and \[codebook\]
+(<https://www.cdc.gov/brfss/annual_data/2015/pdf/codebook15_llcp.pdf>):
+
+- BMI Categories: Classified BMI into standard categories (Underweight,
+  Normal, Overweight, Obese);
+
+- Mental Health Categories: Grouped days of poor mental health (None,
+  1-7 days, 8-14 days, 15-30 days);
+
+- Physical Health Categories: Grouped days of poor physical health using
+  the same categorization;
+
+- Health Risk Score: Created a composite score (0-7) summing major
+  health conditions plus normalized general health rating;
+
+- Lifestyle Score: Calculated a score (0-3) based on physical activity,
+  fruit consumption, and vegetable consumption.
+
+4.3. Train-Test Split
+
+To ensure robust model evaluation, we split the data into training and
+testing sets:
+
+• Training set: 202,944 observations (80%) - used for exploratory
+analysis and model development;
+
+• Testing set: 50,736 observations (20%) - reserved exclusively for
+final model evaluation;
+
+• Stratification method: Used stratified random sampling to maintain the
+outcome distribution (13.5% diabetes prevalence) in both sets;
+
+• Reproducibility: Set random seed to 123 to ensure consistent splits
+across all analyses.
+
+4.4. Cleaned Dataset
+
+The cleaned dataset is tidy, readable, and analyzable. It includes the
+following variables: Outcome Variable: \* diabetes_binary: Whether the
+individual has diabetes or prediabetes (No_Diabetes, Diabetes). \*
+Health Conditions: \* high_bp: High blood pressure diagnosis (No, Yes).
+\* high_chol: High cholesterol diagnosis (No, Yes). \* stroke: History
+of stroke (No, Yes). \* heart_disease_or_attack: History of coronary
+heart disease or heart attack (No, Yes). \* chol_check: Had cholesterol
+check in past 5 years (No, Yes).
+
+Physical Metrics: \* bmi: Body Mass Index (continuous numeric). \*
+bmi_category: BMI classification (Underweight, Normal, Overweight,
+Obese). \* diff_walk: Difficulty walking or climbing stairs (No, Yes).
+
+Lifestyle Behaviors: \* smoker: Smoked at least 100 cigarettes in
+lifetime (No, Yes). \* phys_activity: Physical activity in past 30 days
+(No, Yes). \* fruits: Consume fruit 1+ times per day (No, Yes). \*
+veggies: Consume vegetables 1+ times per day (No, Yes).
+hvy_alcohol_consump: Heavy alcohol consumption (No, Yes). Health Status:
+\* gen_hlth: General health rating (1-5: Excellent to Poor). \*
+ment_hlth: Days of poor mental health in past 30 days (0-30). \*
+phys_hlth: Days of poor physical health in past 30 days (0-30). \*
+ment_hlth_cat: Mental health categories (None, 1-7 days, 8-14 days,
+15-30 days). \* phys_hlth_cat: Physical health categories (None, 1-7
+days, 8-14 days, 15-30 days).
+
+Healthcare Access: \* any_healthcare: Have any healthcare coverage (No,
+Yes). \* no_docbc_cost: Could not see doctor due to cost (No, Yes).
+
+Demographics: \* age: Age category (1-13). \* age_cat: Age groups with
+labels (18-24, 25-29, …, 80+). \* sex: Biological sex (Female, Male). \*
+education: Education level (1-6). \* education_cat: Education categories
+(Never/K-8, Grades 9-11, Grade 12/GED, College 1-3 yrs, College 4+ yrs,
+Unknown). \* income: Income level (1-8). \* income_cat: Income
+categories (\<\$10k, \$10k-\$15k, …, \$75k+).
+
+Engineered Features: \* health_risk_score: Composite health risk score
+(0-7, higher indicates more risk factors). \* lifestyle_score: Healthy
+lifestyle score (0-3, higher indicates healthier behaviors).
+
 ## Exploratory analysis
 
 ``` r
@@ -879,6 +1030,8 @@ Overall, the plot confirms that each variable contributes distinct
 information for diabetes risk prediction.
 
 ## Additional analysis
+
+# Logistic regression modeling (main effects, subgroups, interactions)
 
 # Fit Logistic Regression Models
 
@@ -1772,7 +1925,7 @@ highlight the dominant role of adiposity, age-related risk, blood
 pressure, and overall perceived health status in determining diabetes
 risk.
 
-\##YW
+# Predictive model evaluation (ROC/AUC, confusion matrix, feature importance)
 
 ``` r
 # 1. Generate Probabilities for All Models
