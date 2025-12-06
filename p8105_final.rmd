@@ -546,4 +546,4 @@ Variables related to overall health, such as general health and physical or ment
 
 While BMI and age show only weak relationships with other predictors. 
 Overall, the plot confirms that each variable contributes distinct information for diabetes risk prediction.
-
+ 
