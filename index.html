@@ -9,7 +9,6 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="daisy_gui" />
 
 
 <title>Diabetes Risk Prediction Using Behavioral and Demographic Factors</title>
@@ -345,11 +344,15 @@ div.tocify {
 
 <h1 class="title toc-ignore">Diabetes Risk Prediction Using Behavioral
 and Demographic Factors</h1>
-<h4 class="author">daisy_gui</h4>
 
 </div>
 
 
+<p>This is a brief overview on our project.</p>
+<p>Please find the <a href="Full-Report.html">full report</a>, <a
+href="Screencast.html">screencast</a>, and the <a
+href="final_1205.html">analysis and code</a> here or from the top of the
+page.</p>
 <div id="motivation" class="section level1">
 <h1>Motivation</h1>
 <p>Diabetes is one of the most prevalent chronic diseases in the United
@@ -424,16 +427,16 @@ only)</p></li>
 <li><strong>Strong class imbalance (far more non-diabetic
 respondents).</strong></li>
 </ul>
-<p><img src="index_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p><img src="image/unnamed-chunk-10-1.png" /></p>
 <p>According to this plot, diabetes individual included is much less
 than non-diabetes. This may lead to strong class imbalance.</p>
-<p><img src="index_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p><img src="image/unnamed-chunk-11-1.png" /></p>
 <p>The BMI in this sample is right-skewed, with most values falling
 between 20 and 40.</p>
 <p>The concentration of observations in the overweight and obese range
 reflects the population distribution in this dataset. A smaller number
 of individuals have very high BMI values, forming a long right tail.</p>
-<p><img src="index_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p><img src="image/unnamed-chunk-12-1.png" /></p>
 <p>Left-skewness in this plot shows that the dataset contains far more
 middle-aged and older adults than younger respondents. Counts increase
 steadily from the 18–24 group and peak between ages 55–69, before
@@ -445,15 +448,15 @@ groups.</p>
 <li><strong>Diabetic individuals tend to have higher BMI, poor general
 health, and older age.</strong></li>
 </ul>
-<p><img src="index_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p><img src="image/unnamed-chunk-14-1.png" /></p>
 <p>The plot shows that individuals included with diabetes tend to have
 higher BMI values than those without diabetes. Both the median and
 overall distribution of diabetes group shifted upward.</p>
-<p><img src="index_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p><img src="image/unnamed-chunk-15-1.png" /></p>
 <p>The plot shows that the median age category is higher for the
 diabetes group, and their overall distribution is shifted toward older
 age ranges.</p>
-<p><img src="index_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<p><img src="image/unnamed-chunk-16-1.png" /></p>
 <p>The plot shows that individuals with diabetes generally report worse
 overall health than those without diabetes. The diabetes group has a
 higher median health score, which indicates poorer health and a
@@ -462,8 +465,8 @@ distribution shifted toward less favorable health ratings.</p>
 <li><strong>Income distribution is skewed toward higher brackets, which
 may influence access to care.</strong></li>
 </ul>
-<p><img src="index_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
-<p><img src="index_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<p><img src="image/unnamed-chunk-13-1.png" /></p>
+<p><img src="image/unnamed-chunk-17-1.png" /></p>
 <p>The heatmap shows that correlations among the numeric predictors are
 generally weak to moderate, indicating low multicollinearity and
 supporting their joint use in logistic regression models.</p>
@@ -481,16 +484,21 @@ information for diabetes risk prediction.</p>
 <h2>1. Proposed Model Performed Best</h2>
 <p>We compared three logistic regression models:</p>
 <ul>
-<li><p>Main Effects Model</p></li>
-<li><p>BMI × Age Interaction Model</p></li>
-<li><p>High-Interaction Model</p></li>
+<li><p><strong>Main Effects Model：</strong> containing core demographic
+and health variables (bmi, age level, general health category, high
+blood pressure, high cholesterol, physical activity, smoker, heart
+disease or attack, income level, education level, sex)</p></li>
+<li><p><strong>Subgroup Model：</strong> incorporating an interaction
+between BMI and Age</p></li>
+<li><p><strong>High-Interaction Model:</strong> adding complex terms for
+BMI, physical activity, and high blood pressure</p></li>
 </ul>
 <p>The Main Effects Model achieved the highest predictive performance
 (AUC = 0.806 vs. 0,799 vs. 0.781) and best calibration.</p>
 <p>Adding interaction terms did not improve accuracy and sometimes
 reduced sensitivity, suggesting noise rather than signal was
 introduced.</p>
-<p><img src="index_files/figure-html/unnamed-chunk-26-1.png" width="672" /></p>
+<p><img src="image/unnamed-chunk-24-1.png" /></p>
 <p>The ROC curves show that the Main Effects model consistently achieves
 the highest sensitivity across specificity levels. This confirms its
 better discrimination ability compared with the BMI × Age and
@@ -505,14 +513,13 @@ choice for diabetes risk prediction.</p>
 <h2>2. Significant Predictors of Diabetes</h2>
 <p>The variables most strongly associated with diabetes were:</p>
 <ul>
-<li>age level</li>
-<li>general health rating</li>
+<li>age</li>
 <li>BMI</li>
 <li>high blood pressure</li>
 <li>high cholesterol</li>
-<li>socioeconomic indicators</li>
+<li>income</li>
 </ul>
-<p><img src="index_files/figure-html/unnamed-chunk-27-1.png" width="672" /></p>
+<p><img src="image/unnamed-chunk-34-1.png" /></p>
 <p>These findings align with established clinical literature, which
 means they support the external validity of our model.</p>
 </div>
@@ -526,7 +533,7 @@ sensitivity (~15%)</strong>.</p>
 significantly <strong>improved sensitivity</strong> while maintaining
 acceptable specificity. This improved the model in ability of
 identifying high-risk individuals from public health screening.</p>
-<p><img src="index_files/figure-html/unnamed-chunk-28-1.png" width="672" /></p>
+<p><img src="image/unnamed-chunk-33-1.png" /></p>
 <p>This confusion matrix illustrates the performance of the Main Effects
 model after lowering the decision threshold to 0.141.</p>
 <p>With this threshold, the model correctly identifies far more true
@@ -538,14 +545,15 @@ follow-up testing.</p>
 </div>
 <div id="takeaway-messages" class="section level2">
 <h2>4. Takeaway Messages</h2>
-<p>According to our model, predictors from a short list of survey
-questions that are included in our model, especially <strong>age,
-general health rating, BMI</strong>, may be able to provide reliable
-early risk stratification without clinical testing.</p>
-<p><strong>A straightforward model using basic survey questions can
-still pick out individuals who are at higher risk for diabetes reliably.
-Making the current model more complicated didn’t improve the
-model.</strong></p>
+<p>According to our model, the 12 predictors which can be collected from
+a short list of survey questions that are included in our model,
+including <strong>age, general health rating, BMI, </strong>, may be
+able to provide reliable early risk stratification without clinical
+testing.</p>
+<p><strong>A straightforward model using data from basic survey
+questions can still pick out individuals who are at higher risk for
+diabetes reliably. Making the current model more complicated didn’t
+improve the model.</strong></p>
 <p><strong>This means early diabetes screening could be done with quick
 survey data before medical tests, which makes the screening more
 affordable and accessible.</strong></p>
