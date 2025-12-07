@@ -17,7 +17,8 @@ knitr::opts_chunk$set(
 
 This is a brief overview on our project. 
 
-Please find the [full report](Full-Report.html), [screencast](Screencast.html), and the [analysis and code](final_1205.html) here or from the top of the page. 
+Please find the [full report](Final_Project_Report.html), [screencast](Screencast.html), and the [analysis and code](Analysis_and_code.html) here or from the top of the page.
+Please find GitHub repository on the up right corner. 
 
 # Motivation
 

@@ -33,7 +33,7 @@ Diabetes is one of the most prevalent chronic diseases in the United States, aff
 
 ## 2. Related work
 
-This project is inspired by the CDC's ongoing efforts to combat the diabetes epidemic and previous research demonstrating the value of behavioral risk factor data for disease prediction. Recent work by [Li et al. (2024)] (https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0311222) used the BRFSS dataset to develop a diabetes prediction model using advanced ensemble learning methods, combining GA-XGBoost with Stacking techniques and achieving high predictive accuracy. Their work demonstrated the effectiveness of addressing class imbalance through sampling methods like SMOTEENN and using SHAP for model interpretation. The logistic regression and predictive modeling techniques covered in P8105 provided the foundation for our analytical approach, particularly the lectures on binary outcomes, model evaluation using ROC curves, and the importance of reproducible research.
+This project is inspired by the CDC's ongoing efforts to combat the diabetes epidemic and previous research demonstrating the value of behavioral risk factor data for disease prediction. Recent work by [Li et al. (2024)](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0311222) used the BRFSS dataset to develop a diabetes prediction model using advanced ensemble learning methods, combining GA-XGBoost with Stacking techniques and achieving high predictive accuracy. Their work demonstrated the effectiveness of addressing class imbalance through sampling methods like SMOTEENN and using SHAP for model interpretation. The logistic regression and predictive modeling techniques covered in P8105 provided the foundation for our analytical approach, particularly the lectures on binary outcomes, model evaluation using ROC curves, and the importance of reproducible research.
 
 
 ## 3. Initial question
@@ -302,7 +302,7 @@ write_csv(data_dictionary, "data/data_dictionary.csv")
 
 **4.1 Data source **
 
-Our data source is from [Kaggle] (https://www.kaggle.com/datasets/alexteboul/diabetes-health-indicators-dataset). This dataset covers detailed health information on 253,680 survey respondents from the CDC's Behavioral Risk Factor Surveillance System (BRFSS) 2015. It includes a wide range of attributes such as health conditions, lifestyle behaviors, demographic information, and healthcare access. The data was collected through telephone surveys conducted across the United States. The original dataset is called diabetes_binary_health_indicators_BRFSS2015.csv.
+Our data source is from [Kaggle](https://www.kaggle.com/datasets/alexteboul/diabetes-health-indicators-dataset). This dataset covers detailed health information on 253,680 survey respondents from the CDC's Behavioral Risk Factor Surveillance System (BRFSS) 2015. It includes a wide range of attributes such as health conditions, lifestyle behaviors, demographic information, and healthcare access. The data was collected through telephone surveys conducted across the United States. The original dataset is called diabetes_binary_health_indicators_BRFSS2015.csv.
  
 **4.2 Data Cleaning Process**
 
@@ -310,8 +310,7 @@ The BRFSS dataset was already well-maintained with minimal data quality issues. 
 
  * Variable name standardization: Converted all variable names to snake_case format for consistency (e.g., HeartDiseaseorAttack to heart_disease_or_attack);
  * Data quality checks: Verified that there were no missing values or duplicate observations in the dataset;
- * Factor conversion: Converted all binary variables (0/1) to factors with meaningful labels (e.g., "No"/"Yes" for health conditions, "Female"/"Male" for sex, "No_Diabetes"/"Diabetes" for the outcome variable) according to [dataset notebook] 
-(https://www.kaggle.com/code/alexteboul/diabetes-health-indicators-dataset-notebook) and [codebook] (https://www.cdc.gov/brfss/annual_data/2015/pdf/codebook15_llcp.pdf);
+ * Factor conversion: Converted all binary variables (0/1) to factors with meaningful labels (e.g., "No"/"Yes" for health conditions, "Female"/"Male" for sex, "No_Diabetes"/"Diabetes" for the outcome variable) according to [dataset notebook](https://www.kaggle.com/code/alexteboul/diabetes-health-indicators-dataset-notebook) and [codebook](https://www.cdc.gov/brfss/annual_data/2015/pdf/codebook15_llcp.pdf);
  * Ordered factor creation: Created ordered factors for variables with natural ordering (general health from Excellent to Poor, age groups from 18-24 to 80+, education and income levels);
  * Feature engineering: Created interpretable new variables according to [dataset notebook] (https://www.kaggle.com/code/alexteboul/diabetes-health-indicators-dataset-notebook) and [codebook] (https://www.cdc.gov/brfss/annual_data/2015/pdf/codebook15_llcp.pdf):
     - BMI Categories: Classified BMI into standard categories (Underweight, Normal, Overweight, Obese);
@@ -1010,27 +1009,6 @@ Then, we conducted age-stratified logistic regressions to compare predictors acr
 
 
 # Predictive model evaluation
-
-
-
-To investigate the determinants of diabetes in this population, we fitted a series of logistic regression models designed to evaluate main effects, potential effect modification, nonlinear associations, and cumulative health burden. Logistic regression is well suited for this analysis because the outcome—presence of diabetes—is binary, and the large sample size allows stable estimation of adjusted odds ratios across multiple predictors. Each model was selected to answer a specific analytic question and to refine our understanding of how demographic, behavioral, and clinical variables influence diabetes risk.
-The main-effects model served as the primary analytic framework and included BMI, age, sex, general health, high blood pressure, high cholesterol, smoking, physical activity, and socioeconomic factors. This model identified the strongest independent predictors of diabetes. Higher BMI, poorer self-rated general health, and hypertension were among the most influential variables; each 1-unit increase in BMI raised the odds of diabetes by approximately 6%, high blood pressure more than doubled the odds, and poor general health increased the odds more than six-fold. Men also demonstrated higher risk compared with women. This model establishes the baseline pattern of adjusted associations and forms the foundation for all subsequent analyses.
-
-To assess effect modification by age, we fitted a BMI × age category interaction model. Age may alter the metabolic consequences of adiposity, and interaction terms allow the BMI slope to vary across age groups. The model showed that BMI remained a significant predictor at all ages, but its effect was stronger among older adults, suggesting heightened metabolic susceptibility later in life. This model clarifies that the BMI–diabetes relationship is not uniform across age categories.
-
-A more complex three-way interaction model examined whether the relationship between BMI and diabetes differed jointly by physical activity and high blood pressure. This analysis tested whether behavioral and clinical factors interact multiplicatively to modify risk. Although BMI and hypertension remained strong predictors, the interaction terms were not statistically significant, indicating that these risk factors operate largely independently. This model helps rule out synergistic modification and reinforces conclusions from the main-effects model.
-
-Recognizing that the association between BMI and diabetes may be nonlinear, we fitted a restricted cubic spline model to allow the BMI–risk curve to vary flexibly without imposing a linear structure. The spline analysis revealed a slowly increasing risk at lower BMI levels and a sharp escalation in risk across the overweight and obese ranges. This model demonstrates that diabetes risk accelerates nonlinearly with increasing adiposity and provides a more nuanced understanding of the BMI–risk relationship.
-
-To examine potential sex differences, we fitted a BMI × sex interaction model. Physiologic and hormonal differences could plausibly modify BMI’s effect; however, the interaction term was small and not clinically meaningful. BMI had a similar effect in both sexes, although male sex remained an independent predictor of higher risk. This model shows that sex differences in diabetes risk arise from baseline differences rather than differential BMI effects.
-
-We further explored social determinants by fitting an income × general health interaction model. Although both lower income and poorer general health independently increased diabetes risk, the interaction terms were not statistically significant, indicating that income does not materially alter the strength of the association between health status and diabetes. This model suggests that socioeconomic and health-status gradients contribute additively to risk.
-
-Because psychological stress and activity levels may jointly influence metabolic outcomes, we examined a mental health × physical activity model. While poor mental health and inactivity were each associated with higher diabetes risk, their interaction was not significant, suggesting that physical activity does not strongly modify the mental-health–diabetes relationship. This model highlights the independent, rather than interactive, roles of psychosocial and behavioral factors.
-
-To capture overall chronic disease burden, we constructed a multi-morbidity model using a composite health risk score. This model demonstrated a strong dose–response pattern: each additional comorbidity substantially increased diabetes risk. The model confirms that cumulative health burden is a powerful predictor and provides an efficient summary of cardiometabolic vulnerability.
-
-Then, we conducted age-stratified logistic regressions to compare predictors across younger and older adults. Stratification allowed us to estimate separate models without relying on interaction terms. BMI and high blood pressure were significant predictors in both strata, but their effects were stronger among older adults. Poor self-rated health remained a robust predictor across age groups. These models reinforce earlier findings and highlight age-specific differences in vulnerability.
 
 
 ```{r}
