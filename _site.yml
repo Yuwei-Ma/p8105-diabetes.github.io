@@ -4,7 +4,7 @@ output_dir: "."
 navbar:
   title: "P8105 Final Project"
   left:
-    - text: "Diabetes Risk Prediction Using Behavioral and Demographic Factors"
+    - text: "Diabetes Risk Prediction" # Shortened for better fit
       href: index.html
     - text: "Final Project Report"
       href: Final_Project_Report.html
@@ -12,9 +12,9 @@ navbar:
       href: Analysis_and_code.html
     - text: "Screencast"
       href: Screencast.html
-    - icon: fa-github fa-lg
+  right:
+    - icon: "fa fa-github fa-lg"
       href: https://github.com/Yuwei-Ma/p8105-diabetes.github.io
-
 output:
   html_document:
     theme: cerulean
