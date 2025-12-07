@@ -321,9 +321,11 @@ write_csv(data_dictionary, "data/data_dictionary.csv")
 
 
 **4.1 Data source **
+
 Our data source is from [Kaggle] (https://www.kaggle.com/datasets/alexteboul/diabetes-health-indicators-dataset). This dataset covers detailed health information on 253,680 survey respondents from the CDC's Behavioral Risk Factor Surveillance System (BRFSS) 2015. It includes a wide range of attributes such as health conditions, lifestyle behaviors, demographic information, and healthcare access. The data was collected through telephone surveys conducted across the United States. The original dataset is called diabetes_binary_health_indicators_BRFSS2015.csv.
  
 **4.2 Data Cleaning Process**
+
 The BRFSS dataset was already well-maintained with minimal data quality issues. However, we conducted several processing steps to make the data more readable and analyzable:
 
  * Variable name standardization: Converted all variable names to snake_case format for consistency (e.g., HeartDiseaseorAttack to heart_disease_or_attack);
@@ -339,15 +341,20 @@ The BRFSS dataset was already well-maintained with minimal data quality issues. 
     - Lifestyle Score: Calculated a score (0-3) based on physical activity, fruit consumption, and vegetable consumption.
 
 **4.3 Train-Test Split**
+
 To ensure robust model evaluation, we split the data into training and testing sets:
+
  * Training set: 202,944 observations (80%) - used for exploratory analysis and model development;
  * Testing set: 50,736 observations (20%) - reserved exclusively for final model evaluation;
  * Stratification method: Used stratified random sampling to maintain the outcome distribution (13.5% diabetes prevalence) in both sets;
  * Reproducibility: Set random seed to 123 to ensure consistent splits across all analyses.
  
 **4.4 Cleaned Dataset**
+
 The cleaned dataset is tidy, readable, and analyzable. It includes the following variables:
+
 Outcome Variable:
+
  * diabetes_binary: Whether the individual has diabetes or prediabetes (No_Diabetes, Diabetes).
  * Health Conditions:
  * high_bp: High blood pressure diagnosis (No, Yes).
@@ -357,17 +364,20 @@ Outcome Variable:
  * chol_check: Had cholesterol check in past 5 years (No, Yes).
 
 Physical Metrics:
+
  * bmi: Body Mass Index (continuous numeric).
  * bmi_category: BMI classification (Underweight, Normal, Overweight, Obese).
  * diff_walk: Difficulty walking or climbing stairs (No, Yes).
  
 Lifestyle Behaviors:
+
  * smoker: Smoked at least 100 cigarettes in lifetime (No, Yes).
  * phys_activity: Physical activity in past 30 days (No, Yes).
  * fruits: Consume fruit 1+ times per day (No, Yes).
  * veggies: Consume vegetables 1+ times per day (No, Yes).
 hvy_alcohol_consump: Heavy alcohol consumption (No, Yes).
 Health Status:
+
  * gen_hlth: General health rating (1-5: Excellent to Poor).
  * ment_hlth: Days of poor mental health in past 30 days (0-30).
  * phys_hlth: Days of poor physical health in past 30 days (0-30).
@@ -375,10 +385,12 @@ Health Status:
  * phys_hlth_cat: Physical health categories (None, 1-7 days, 8-14 days, 15-30 days).
  
 Healthcare Access:
+
  * any_healthcare: Have any healthcare coverage (No, Yes).
  * no_docbc_cost: Could not see doctor due to cost (No, Yes).
 
 Demographics:
+
  * age: Age category (1-13).
  * age_cat: Age groups with labels (18-24, 25-29, ..., 80+).
  * sex: Biological sex (Female, Male).
@@ -388,6 +400,7 @@ Demographics:
  * income_cat: Income categories (<$10k, $10k-$15k, ..., $75k+).
 
 Engineered Features:
+
  * health_risk_score: Composite health risk score (0-7, higher  indicates more risk factors).
  * lifestyle_score: Healthy lifestyle score (0-3, higher indicates healthier behaviors).
 
@@ -567,7 +580,7 @@ diabetes <- read_csv("data/diabetes_processed.csv") %>%
   )
 ```
 
-# Exploratory Analysis
+
 
 A series of descriptive and visualization-based exploratory analyses was conducted to characterize the BRFSS 2015 diabetes dataset and to inform subsequent modeling decisions.
 
@@ -760,7 +773,7 @@ EDA also helped us differentiate variables that are best suited for descriptive 
 
 ## Additional Analysis
 
-# Fit Logistic Regression Models
+**Fit Logistic Regression Models**
 ```{r}
 diabetes_train_model <- diabetes_train %>%
   mutate(
@@ -780,7 +793,7 @@ diabetes_train_model <- diabetes_train %>%
   )
 ```
 
-## Main Effects Model
+**Main Effects Model**
 ```{r}
 logit_main <- glm(
 diabetes_binary ~ bmi + age_cat + gen_hlth_cat + high_bp + high_chol +
@@ -1187,7 +1200,6 @@ Finally, to validate the accuracy of the probability estimates, we examined the 
 
 ## Discussion
 
-
 Across all models, several consistent and quantitatively strong findings emerged. BMI was one of the most influential predictors of diabetes: each 1-unit increase was associated with a 6% higher odds of diabetes (OR 1.06, 95% CI 1.06–1.06), and spline analyses revealed a sharply increasing risk at higher BMI levels. High blood pressure also demonstrated a substantial association, with individuals reporting hypertension exhibiting more than double the odds of diabetes (OR 2.30, 95% CI 2.23–2.37). Self-reported general health displayed one of the steepest gradients in the model; respondents who rated their health more poorly experienced over a six-fold increase in diabetes odds compared with those reporting excellent health (dominant contrast OR 6.27, 95% CI 5.94–6.61). Male sex likewise conferred moderately higher risk (OR 1.26, 95% CI 1.22–1.29). Age contributed a pronounced nonlinear effect, reflected in a large positive linear contrast (OR 16.10, 95% CI 13.96–18.69) and inverse higher-order contrasts, indicating complex curvature in the age–risk relationship.
 
 Interaction and stratified analyses further clarified these associations. The effects of BMI and high blood pressure were stronger in older adults, suggesting increasing metabolic vulnerability with age. In contrast, interactions involving physical activity, mental health, income, and sex were small or non-significant, indicating that these factors exert independent rather than modifying effects on diabetes risk. The absence of strong interactions was consistent with expectations, given the established primacy of adiposity and cardiometabolic burden in diabetes etiology.
@@ -1204,7 +1216,9 @@ Critically, the decision to tune the classification threshold to 0.141 reflects 
 
 ## References
 Centers for Disease Control and Prevention (CDC). (2024). National Diabetes Statistics Report. U.S. Department of Health and Human Services. https://www.cdc.gov/diabetes/php/data-research/index.html
+
 Li, W., Peng, Y., & Peng, K. (2024). Diabetes prediction model based on GA-XGBoost and stacking ensemble algorithm. PLOS ONE, 19(9), e0311222. https://doi.org/10.1371/journal.pone.0311222
+
 Parker, E. D., Lin, J., Mahoney, T., Ume, N., Yang, G., Gabbay, R. A., ElSayed, N. A., & Bannuru, R. R. (2024). Economic Costs of Diabetes in the U.S. in 2022. Diabetes Care, 47(1), 26–43. https://doi.org/10.2337/dci23-0085
 
 

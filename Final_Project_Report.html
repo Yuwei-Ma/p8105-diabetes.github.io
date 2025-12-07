@@ -367,8 +367,8 @@ performance?</p></li>
 </ol>
 <div id="data-cleaning" class="section level2">
 <h2>Data Cleaning</h2>
-<p><strong>4.1 Data source </strong> Our data source is from [Kaggle]
-(<a
+<p><strong>4.1 Data source </strong></p>
+<p>Our data source is from [Kaggle] (<a
 href="https://www.kaggle.com/datasets/alexteboul/diabetes-health-indicators-dataset"
 class="uri">https://www.kaggle.com/datasets/alexteboul/diabetes-health-indicators-dataset</a>).
 This dataset covers detailed health information on 253,680 survey
@@ -378,10 +378,10 @@ conditions, lifestyle behaviors, demographic information, and healthcare
 access. The data was collected through telephone surveys conducted
 across the United States. The original dataset is called
 diabetes_binary_health_indicators_BRFSS2015.csv.</p>
-<p><strong>4.2 Data Cleaning Process</strong> The BRFSS dataset was
-already well-maintained with minimal data quality issues. However, we
-conducted several processing steps to make the data more readable and
-analyzable:</p>
+<p><strong>4.2 Data Cleaning Process</strong></p>
+<p>The BRFSS dataset was already well-maintained with minimal data
+quality issues. However, we conducted several processing steps to make
+the data more readable and analyzable:</p>
 <ul>
 <li>Variable name standardization: Converted all variable names to
 snake_case format for consistency (e.g., HeartDiseaseorAttack to
@@ -420,60 +420,92 @@ health conditions plus normalized general health rating;</li>
 activity, fruit consumption, and vegetable consumption.</li>
 </ul></li>
 </ul>
-<p><strong>4.3 Train-Test Split</strong> To ensure robust model
-evaluation, we split the data into training and testing sets: * Training
-set: 202,944 observations (80%) - used for exploratory analysis and
-model development; * Testing set: 50,736 observations (20%) - reserved
-exclusively for final model evaluation; * Stratification method: Used
-stratified random sampling to maintain the outcome distribution (13.5%
-diabetes prevalence) in both sets; * Reproducibility: Set random seed to
-123 to ensure consistent splits across all analyses.</p>
-<p><strong>4.4 Cleaned Dataset</strong> The cleaned dataset is tidy,
-readable, and analyzable. It includes the following variables: Outcome
-Variable: * diabetes_binary: Whether the individual has diabetes or
-prediabetes (No_Diabetes, Diabetes). * Health Conditions: * high_bp:
-High blood pressure diagnosis (No, Yes). * high_chol: High cholesterol
-diagnosis (No, Yes). * stroke: History of stroke (No, Yes). *
-heart_disease_or_attack: History of coronary heart disease or heart
-attack (No, Yes). * chol_check: Had cholesterol check in past 5 years
-(No, Yes).</p>
-<p>Physical Metrics: * bmi: Body Mass Index (continuous numeric). *
-bmi_category: BMI classification (Underweight, Normal, Overweight,
-Obese). * diff_walk: Difficulty walking or climbing stairs (No,
-Yes).</p>
-<p>Lifestyle Behaviors: * smoker: Smoked at least 100 cigarettes in
-lifetime (No, Yes). * phys_activity: Physical activity in past 30 days
-(No, Yes). * fruits: Consume fruit 1+ times per day (No, Yes). *
-veggies: Consume vegetables 1+ times per day (No, Yes).
-hvy_alcohol_consump: Heavy alcohol consumption (No, Yes). Health Status:
-* gen_hlth: General health rating (1-5: Excellent to Poor). * ment_hlth:
-Days of poor mental health in past 30 days (0-30). * phys_hlth: Days of
-poor physical health in past 30 days (0-30). * ment_hlth_cat: Mental
-health categories (None, 1-7 days, 8-14 days, 15-30 days). *
-phys_hlth_cat: Physical health categories (None, 1-7 days, 8-14 days,
-15-30 days).</p>
-<p>Healthcare Access: * any_healthcare: Have any healthcare coverage
-(No, Yes). * no_docbc_cost: Could not see doctor due to cost (No,
-Yes).</p>
-<p>Demographics: * age: Age category (1-13). * age_cat: Age groups with
-labels (18-24, 25-29, …, 80+). * sex: Biological sex (Female, Male). *
-education: Education level (1-6). * education_cat: Education categories
-(Never/K-8, Grades 9-11, Grade 12/GED, College 1-3 yrs, College 4+ yrs,
-Unknown). * income: Income level (1-8). * income_cat: Income categories
-(&lt;$10k, $10k-$15k, …, $75k+).</p>
-<p>Engineered Features: * health_risk_score: Composite health risk score
-(0-7, higher indicates more risk factors). * lifestyle_score: Healthy
-lifestyle score (0-3, higher indicates healthier behaviors).</p>
+<p><strong>4.3 Train-Test Split</strong></p>
+<p>To ensure robust model evaluation, we split the data into training
+and testing sets:</p>
+<ul>
+<li>Training set: 202,944 observations (80%) - used for exploratory
+analysis and model development;</li>
+<li>Testing set: 50,736 observations (20%) - reserved exclusively for
+final model evaluation;</li>
+<li>Stratification method: Used stratified random sampling to maintain
+the outcome distribution (13.5% diabetes prevalence) in both sets;</li>
+<li>Reproducibility: Set random seed to 123 to ensure consistent splits
+across all analyses.</li>
+</ul>
+<p><strong>4.4 Cleaned Dataset</strong></p>
+<p>The cleaned dataset is tidy, readable, and analyzable. It includes
+the following variables:</p>
+<p>Outcome Variable:</p>
+<ul>
+<li>diabetes_binary: Whether the individual has diabetes or prediabetes
+(No_Diabetes, Diabetes).</li>
+<li>Health Conditions:</li>
+<li>high_bp: High blood pressure diagnosis (No, Yes).</li>
+<li>high_chol: High cholesterol diagnosis (No, Yes).</li>
+<li>stroke: History of stroke (No, Yes).</li>
+<li>heart_disease_or_attack: History of coronary heart disease or heart
+attack (No, Yes).</li>
+<li>chol_check: Had cholesterol check in past 5 years (No, Yes).</li>
+</ul>
+<p>Physical Metrics:</p>
+<ul>
+<li>bmi: Body Mass Index (continuous numeric).</li>
+<li>bmi_category: BMI classification (Underweight, Normal, Overweight,
+Obese).</li>
+<li>diff_walk: Difficulty walking or climbing stairs (No, Yes).</li>
+</ul>
+<p>Lifestyle Behaviors:</p>
+<ul>
+<li><p>smoker: Smoked at least 100 cigarettes in lifetime (No,
+Yes).</p></li>
+<li><p>phys_activity: Physical activity in past 30 days (No,
+Yes).</p></li>
+<li><p>fruits: Consume fruit 1+ times per day (No, Yes).</p></li>
+<li><p>veggies: Consume vegetables 1+ times per day (No, Yes).
+hvy_alcohol_consump: Heavy alcohol consumption (No, Yes). Health
+Status:</p></li>
+<li><p>gen_hlth: General health rating (1-5: Excellent to
+Poor).</p></li>
+<li><p>ment_hlth: Days of poor mental health in past 30 days
+(0-30).</p></li>
+<li><p>phys_hlth: Days of poor physical health in past 30 days
+(0-30).</p></li>
+<li><p>ment_hlth_cat: Mental health categories (None, 1-7 days, 8-14
+days, 15-30 days).</p></li>
+<li><p>phys_hlth_cat: Physical health categories (None, 1-7 days, 8-14
+days, 15-30 days).</p></li>
+</ul>
+<p>Healthcare Access:</p>
+<ul>
+<li>any_healthcare: Have any healthcare coverage (No, Yes).</li>
+<li>no_docbc_cost: Could not see doctor due to cost (No, Yes).</li>
+</ul>
+<p>Demographics:</p>
+<ul>
+<li>age: Age category (1-13).</li>
+<li>age_cat: Age groups with labels (18-24, 25-29, …, 80+).</li>
+<li>sex: Biological sex (Female, Male).</li>
+<li>education: Education level (1-6).</li>
+<li>education_cat: Education categories (Never/K-8, Grades 9-11, Grade
+12/GED, College 1-3 yrs, College 4+ yrs, Unknown).</li>
+<li>income: Income level (1-8).</li>
+<li>income_cat: Income categories (&lt;$10k, $10k-$15k, …, $75k+).</li>
+</ul>
+<p>Engineered Features:</p>
+<ul>
+<li>health_risk_score: Composite health risk score (0-7, higher
+indicates more risk factors).</li>
+<li>lifestyle_score: Healthy lifestyle score (0-3, higher indicates
+healthier behaviors).</li>
+</ul>
 </div>
 <div id="exploratory-analysis" class="section level2">
 <h2>Exploratory analysis</h2>
-</div>
-</div>
-<div id="exploratory-analysis-1" class="section level1">
-<h1>Exploratory Analysis</h1>
 <p>A series of descriptive and visualization-based exploratory analyses
 was conducted to characterize the BRFSS 2015 diabetes dataset and to
 inform subsequent modeling decisions.</p>
+</div>
 </div>
 <div id="overall-distribution-of-diabetes-status"
 class="section level1">
@@ -590,12 +622,8 @@ upstream, behaviorally and demographically grounded predictors in our
 modeling framework.</p>
 <div id="additional-analysis" class="section level2">
 <h2>Additional Analysis</h2>
-</div>
-</div>
-<div id="fit-logistic-regression-models" class="section level1">
-<h1>Fit Logistic Regression Models</h1>
-<div id="main-effects-model" class="section level2">
-<h2>Main Effects Model</h2>
+<p><strong>Fit Logistic Regression Models</strong></p>
+<p><strong>Main Effects Model</strong></p>
 <p><img src="Final_Project_Report_files/figure-html/unnamed-chunk-22-1.png" width="672" /></p>
 <table>
 <caption>Final Multivariable Logistic Regression Model for Diabetes
@@ -1020,14 +1048,14 @@ support aid.</p>
 Diabetes Statistics Report. U.S. Department of Health and Human
 Services. <a
 href="https://www.cdc.gov/diabetes/php/data-research/index.html"
-class="uri">https://www.cdc.gov/diabetes/php/data-research/index.html</a>
-Li, W., Peng, Y., &amp; Peng, K. (2024). Diabetes prediction model based
-on GA-XGBoost and stacking ensemble algorithm. PLOS ONE, 19(9),
+class="uri">https://www.cdc.gov/diabetes/php/data-research/index.html</a></p>
+<p>Li, W., Peng, Y., &amp; Peng, K. (2024). Diabetes prediction model
+based on GA-XGBoost and stacking ensemble algorithm. PLOS ONE, 19(9),
 e0311222. <a href="https://doi.org/10.1371/journal.pone.0311222"
-class="uri">https://doi.org/10.1371/journal.pone.0311222</a> Parker, E.
-D., Lin, J., Mahoney, T., Ume, N., Yang, G., Gabbay, R. A., ElSayed, N.
-A., &amp; Bannuru, R. R. (2024). Economic Costs of Diabetes in the U.S.
-in 2022. Diabetes Care, 47(1), 26–43. <a
+class="uri">https://doi.org/10.1371/journal.pone.0311222</a></p>
+<p>Parker, E. D., Lin, J., Mahoney, T., Ume, N., Yang, G., Gabbay, R.
+A., ElSayed, N. A., &amp; Bannuru, R. R. (2024). Economic Costs of
+Diabetes in the U.S. in 2022. Diabetes Care, 47(1), 26–43. <a
 href="https://doi.org/10.2337/dci23-0085"
 class="uri">https://doi.org/10.2337/dci23-0085</a></p>
 </div>
