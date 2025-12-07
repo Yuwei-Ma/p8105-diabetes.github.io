@@ -12,7 +12,8 @@ navbar:
       href: Analysis_and_code.html
     - text: "Screencast"
       href: Screencast.html
-
+    - icon: fa-github fa-lg
+      href: https://github.com/Yuwei-Ma/p8105-diabetes.github.io
 
 output:
   html_document:
