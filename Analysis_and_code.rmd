@@ -356,21 +356,11 @@ variables_summary <- tibble(
 kable(variables_summary, caption = "Dataset Variables by Category")
 ```
 
-## Report Writing
-
-**1. Motivation**
-
-Diabetes is one of the most prevalent chronic diseases in the United States, affecting 38.4 million Americans (11.6% of the U.S. population) as of 2021 (CDC, 2024). The estimated total cost of diagnosed diabetes reached 412.9 billion dollars in 2022, including 306.6 billion dollars in direct medical costs and 106.3 billion dollars in indirect costs (Parker et al., 2024). A significant challenge in diabetes management is underdiagnosis—approximately 1 in 5 adults with diabetes and more than 8 in 10 adults with prediabetes are unaware of their condition (CDC, 2024). This project aims to identify key behavioral, demographic, and clinical factors associated with diabetes risk and build predictive models to support early detection and intervention.
-
-**2. Related Work**
-
-This project is inspired by the CDC's ongoing efforts to combat the diabetes epidemic and previous research demonstrating the value of behavioral risk factor data for disease prediction. Recent work by [Li et al. (2024)] (https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0311222) used the BRFSS dataset to develop a diabetes prediction model using advanced ensemble learning methods, combining GA-XGBoost with Stacking techniques and achieving high predictive accuracy. Their work demonstrated the effectiveness of addressing class imbalance through sampling methods like SMOTEENN and using SHAP for model interpretation. The logistic regression and predictive modeling techniques covered in P8105 provided the foundation for our analytical approach, particularly the lectures on binary outcomes, model evaluation using ROC curves, and the importance of reproducible research.
-
 **4. Data**
 
 4.1 Data Source
 
-Our data source is from [Kaggle] (https://www.kaggle.com/datasets/alexteboul/diabetes-health-indicators-dataset). This dataset covers detailed health information on 253,680 survey respondents from the CDC's Behavioral Risk Factor Surveillance System (BRFSS) 2015. It includes a wide range of attributes such as health conditions, lifestyle behaviors, demographic information, and healthcare access. The data was collected through telephone surveys conducted across the United States. The original dataset is called diabetes_binary_health_indicators_BRFSS2015.csv.
+Our data source is from [Kaggle](https://www.kaggle.com/datasets/alexteboul/diabetes-health-indicators-dataset). This dataset covers detailed health information on 253,680 survey respondents from the CDC's Behavioral Risk Factor Surveillance System (BRFSS) 2015. It includes a wide range of attributes such as health conditions, lifestyle behaviors, demographic information, and healthcare access. The data was collected through telephone surveys conducted across the United States. The original dataset is called diabetes_binary_health_indicators_BRFSS2015.csv.
 
 
 4.2. Data Cleaning Process
@@ -381,11 +371,11 @@ The BRFSS dataset was already well-maintained with minimal data quality issues. 
 
 •       Data quality checks: Verified that there were no missing values or duplicate observations in the dataset;
 
-•       Factor conversion: Converted all binary variables (0/1) to factors with meaningful labels (e.g., "No"/"Yes" for health conditions, "Female"/"Male" for sex, "No_Diabetes"/"Diabetes" for the outcome variable) according to [dataset notebook] (https://www.kaggle.com/code/alexteboul/diabetes-health-indicators-dataset-notebook) and [codebook] (https://www.cdc.gov/brfss/annual_data/2015/pdf/codebook15_llcp.pdf);
+•       Factor conversion: Converted all binary variables (0/1) to factors with meaningful labels (e.g., "No"/"Yes" for health conditions, "Female"/"Male" for sex, "No_Diabetes"/"Diabetes" for the outcome variable) according to [dataset notebook](https://www.kaggle.com/code/alexteboul/diabetes-health-indicators-dataset-notebook) and [codebook](https://www.cdc.gov/brfss/annual_data/2015/pdf/codebook15_llcp.pdf);
 
 •       Ordered factor creation: Created ordered factors for variables with natural ordering (general health from Excellent to Poor, age groups from 18-24 to 80+, education and income levels);
 
-•       Feature engineering: Created interpretable new variables according to [dataset notebook] (https://www.kaggle.com/code/alexteboul/diabetes-health-indicators-dataset-notebook) and [codebook] (https://www.cdc.gov/brfss/annual_data/2015/pdf/codebook15_llcp.pdf):
+•       Feature engineering: Created interpretable new variables according to [dataset notebook](https://www.kaggle.com/code/alexteboul/diabetes-health-indicators-dataset-notebook) and [codebook](https://www.cdc.gov/brfss/annual_data/2015/pdf/codebook15_llcp.pdf):
 
   - BMI Categories: Classified BMI into standard categories (Underweight, Normal, Overweight, Obese);
 
@@ -495,29 +485,6 @@ We use the cleaned [2015 BRFSS dataset](https://www.kaggle.com/datasets/alextebo
 - **Outcome:** Self-reported diabetes status (binary outcome used for prediction).
 - **Main predictors:** BMI, age category, general health rating, blood pressure, cholesterol, smoking status, physical activity, sex, and socioeconomic indicators
 
-## Key preprocessing steps:
-
-- No missing data were present (already cleaned by BRFSS).
-
-- Created interpretable new variables according to [dataset notebook](https://www.kaggle.com/code/alexteboul/diabetes-health-indicators-dataset-notebook) and [codebook](https://www.cdc.gov/brfss/annual_data/2015/pdf/codebook15_llcp.pdf). 
-
-  - BMI categories
-
-  - Mental & physical health categories
-
-  - Composite lifestyle and health-risk scores
-
-  - Converted categorical variables into meaningful factor labels
-
-- Train/test Split
-
-  - 80/20 stratified split is used to preserve diabetes prevalence.
-  
-  - Training set: approximately 202,944 observations (for EDA and model fitting)
-  
-  - Test set: approximately 50,736 observations (for final evaluation only)
-
-- Fixed random seed (123) for reproducibility
 
 ## Exploratory analysis revealed:
 

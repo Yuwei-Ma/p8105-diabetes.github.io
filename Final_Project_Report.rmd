@@ -312,7 +312,7 @@ The BRFSS dataset was already well-maintained with minimal data quality issues. 
  * Data quality checks: Verified that there were no missing values or duplicate observations in the dataset;
  * Factor conversion: Converted all binary variables (0/1) to factors with meaningful labels (e.g., "No"/"Yes" for health conditions, "Female"/"Male" for sex, "No_Diabetes"/"Diabetes" for the outcome variable) according to [dataset notebook](https://www.kaggle.com/code/alexteboul/diabetes-health-indicators-dataset-notebook) and [codebook](https://www.cdc.gov/brfss/annual_data/2015/pdf/codebook15_llcp.pdf);
  * Ordered factor creation: Created ordered factors for variables with natural ordering (general health from Excellent to Poor, age groups from 18-24 to 80+, education and income levels);
- * Feature engineering: Created interpretable new variables according to [dataset notebook] (https://www.kaggle.com/code/alexteboul/diabetes-health-indicators-dataset-notebook) and [codebook] (https://www.cdc.gov/brfss/annual_data/2015/pdf/codebook15_llcp.pdf):
+ * Feature engineering: Created interpretable new variables according to [dataset notebook](https://www.kaggle.com/code/alexteboul/diabetes-[health-indicators-dataset-notebook) and [codebook](https://www.cdc.gov/brfss/annual_data/2015/pdf/codebook15_llcp.pdf):
     - BMI Categories: Classified BMI into standard categories (Underweight, Normal, Overweight, Obese);
     - Mental Health Categories: Grouped days of poor mental health (None, 1-7 days, 8-14 days, 15-30 days);
     - Physical Health Categories: Grouped days of poor physical health using the same categorization;
@@ -1009,7 +1009,6 @@ Then, we conducted age-stratified logistic regressions to compare predictors acr
 
 
 # Predictive model evaluation
-
 
 ```{r}
 # 1. Generate Probabilities for All Models
