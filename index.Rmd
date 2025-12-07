@@ -25,7 +25,7 @@ Diabetes is one of the most prevalent chronic diseases in the United States, aff
 
 The disease reduces life expectancy and quality of life while contributing to severe complications including heart disease, kidney failure, vision loss, and amputations. 
 
-A significant challenge in diabetes management is underdiagnosis. 1 in 5 diabetics and 8 in 10 prediabetics are unaware of their condition. Therefore, **early identification of at-risk individuals** enables lifestyle modification and preventive care, potentially mitigating the burden of diabetes. 
+A significant challenge in diabetes management is underdiagnosis. One in 5 diabetics and 8 in 10 prediabetics are unaware of their condition. Therefore, **early identification of at-risk individuals** enables lifestyle modification and preventive care, potentially mitigating the burden of diabetes. 
 
 ```{r}
 library(tidyverse)
