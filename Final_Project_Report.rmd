@@ -88,22 +88,6 @@ set.seed(123)
 diabetes_raw <- read_csv("data/diabetes_binary_health_indicators_BRFSS2015.csv")
 ```
 
-
-```{r explore_data}
-# Check for missing values
-#colSums(is.na(diabetes_raw))
-
-# Summary statistics
-#summary(diabetes_raw)
-
-# Check for duplicates
-#sum(duplicated(diabetes_raw))
-
-# Examine outcome variable distribution
-#table(diabetes_raw$Diabetes_binary)
-#prop.table(table(diabetes_raw$Diabetes_binary))
-```
-
 ```{r clean_data}
 diabetes_clean <- diabetes_raw %>%
   # Clean column names
@@ -236,7 +220,6 @@ diabetes_processed %>%
   #summary()
 ```
 
-
 ```{r train_test_split}
 # Set seed again for reproducibility
 set.seed(123)
@@ -257,9 +240,6 @@ diabetes_test <- diabetes_processed[-train_index, ]
 nrow(diabetes_train)
 nrow(diabetes_test)
 
-# Check outcome distribution in train and test sets
-#prop.table(table(diabetes_train$diabetes_binary))
-#prop.table(table(diabetes_test$diabetes_binary))
 ```
 
 
@@ -375,7 +355,8 @@ Lifestyle Behaviors:
  * phys_activity: Physical activity in past 30 days (No, Yes).
  * fruits: Consume fruit 1+ times per day (No, Yes).
  * veggies: Consume vegetables 1+ times per day (No, Yes).
-hvy_alcohol_consump: Heavy alcohol consumption (No, Yes).
+ * hvy_alcohol_consump: Heavy alcohol consumption (No, Yes).
+
 Health Status:
 
  * gen_hlth: General health rating (1-5: Excellent to Poor).
@@ -1007,6 +988,7 @@ kable(
   align = "lccc"
 )
 ```
+
 To investigate the determinants of diabetes in this population, we fitted a series of logistic regression models designed to evaluate main effects, potential effect modification, nonlinear associations, and cumulative health burden. Logistic regression is well suited for this analysis because the outcome—presence of diabetes—is binary, and the large sample size allows stable estimation of adjusted odds ratios across multiple predictors. Each model was selected to answer a specific analytic question and to refine our understanding of how demographic, behavioral, and clinical variables influence diabetes risk.
 
 The main-effects model served as the primary analytic framework and included BMI, age, sex, general health, high blood pressure, high cholesterol, smoking, physical activity, and socioeconomic factors. This model identified the strongest independent predictors of diabetes. Higher BMI, poorer self-rated general health, and hypertension were among the most influential variables; each 1-unit increase in BMI raised the odds of diabetes by approximately 6%, high blood pressure more than doubled the odds, and poor general health increased the odds more than six-fold. Men also demonstrated higher risk compared with women. This model establishes the baseline pattern of adjusted associations and forms the foundation for all subsequent analyses.
